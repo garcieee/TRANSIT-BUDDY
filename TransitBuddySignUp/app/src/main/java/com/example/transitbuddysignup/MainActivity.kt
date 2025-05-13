@@ -1,6 +1,7 @@
 package com.example.transitbuddysignup
 
 import android.os.Bundle
+import android.os.StrictMode
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -8,11 +9,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import org.json.JSONArray
-import org.json.JSONObject
-import java.io.File
-import java.io.FileWriter
-import java.io.IOException
+import com.example.transitbuddysignup.db.MongoConnector
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
     
@@ -21,106 +19,55 @@ class MainActivity : AppCompatActivity() {
     private val SIGNUP_PAGE = 2
     private val HOME_PAGE = 3
     
-    // User credentials
-    private var users: MutableList<UserCredential> = mutableListOf()
+    // MongoDB connector
+    private lateinit var mongoConnector: MongoConnector
+    private val executor = Executors.newSingleThreadExecutor()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Load user credentials from JSON file
-        loadUserCredentials()
+        // Allow network on main thread temporarily during development
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
         
-        // Start with landing page
+        // Get MongoDB connector instance (initialization is handled in Application class)
+        mongoConnector = MongoConnector.getInstance()
+        
+        // Start with landing page first
         showPage(LANDING_PAGE)
     }
     
-    private fun loadUserCredentials() {
-        try {
-            val usersList = mutableListOf<UserCredential>()
-            
-            // First check for users in internal storage
-            val internalFile = File(filesDir, "users.json")
-            if (internalFile.exists()) {
-                try {
-                    val internalJsonString = internalFile.readText()
-                    val internalJsonObject = JSONObject(internalJsonString)
-                    val internalUsersArray = internalJsonObject.getJSONArray("users")
-                    
-                    for (i in 0 until internalUsersArray.length()) {
-                        val userObj = internalUsersArray.getJSONObject(i)
-                        val email = userObj.getString("email")
-                        val fullName = userObj.getString("fullName")
-                        val password = userObj.getString("password")
-                        
-                        usersList.add(UserCredential(email, fullName, password))
-                    }
-                    
-                    Toast.makeText(this, "Loaded ${usersList.size} users from local storage", Toast.LENGTH_SHORT).show()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Toast.makeText(this, "Error reading internal file: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                // If internal file doesn't exist, load default users from assets
-                try {
-                    val jsonString = assets.open("users.json").bufferedReader().use { it.readText() }
-                    val jsonObject = JSONObject(jsonString)
-                    val usersArray = jsonObject.getJSONArray("users")
-                    
-                    for (i in 0 until usersArray.length()) {
-                        val userObj = usersArray.getJSONObject(i)
-                        val email = userObj.getString("email")
-                        val fullName = userObj.getString("fullName")
-                        val password = userObj.getString("password")
-                        
-                        usersList.add(UserCredential(email, fullName, password))
-                    }
-                    
-                    // Save the assets users to internal storage for future updates
-                    users = usersList
-                    saveUserCredentials()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Toast.makeText(this, "Error loading default users: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-            
-            users = usersList
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Error loading user credentials: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
+    override fun onResume() {
+        super.onResume()
+        
+        // Check MongoDB connection if needed
+        checkMongoConnection()
     }
     
-    private fun saveUserCredentials() {
-        try {
-            // Create JSON object from users list
-            val jsonObject = JSONObject()
-            val jsonArray = JSONArray()
-            
-            for (user in users) {
-                val userObject = JSONObject()
-                userObject.put("email", user.email)
-                userObject.put("fullName", user.fullName)
-                userObject.put("password", user.password)
-                jsonArray.put(userObject)
+    override fun onDestroy() {
+        // Close MongoDB connection when app is closed
+        mongoConnector.close()
+        executor.shutdown()
+        super.onDestroy()
+    }
+    
+    private fun checkMongoConnection() {
+        // Only try to connect if not already initialized (actual init happens in Application class)
+        executor.execute {
+            try {
+                if (mongoConnector.isConnected()) {
+                    runOnUiThread {
+                        // Only show success message during development
+                        // Toast.makeText(this, "MongoDB connection OK", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                runOnUiThread {
+                    Toast.makeText(this, "Database connection error", Toast.LENGTH_SHORT).show()
+                }
             }
-            
-            jsonObject.put("users", jsonArray)
-            
-            // Create/overwrite the JSON file in internal storage since we can't write to assets directly
-            val file = File(filesDir, "users.json")
-            val writer = FileWriter(file)
-            writer.write(jsonObject.toString())
-            writer.flush()
-            writer.close()
-            
-            // Debug message to show file location
-            Toast.makeText(this, "User saved to: ${file.absolutePath}", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error saving user credentials: ${e.message}", Toast.LENGTH_SHORT).show()
-            e.printStackTrace() // Log the error
         }
     }
     
@@ -179,15 +126,29 @@ class MainActivity : AppCompatActivity() {
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             } else {
-                // Check against users list (which now includes both asset and internal storage users)
-                val user = users.find { it.email == email && it.password == password }
-                if (user != null) {
-                    // Successful login
-                    Toast.makeText(this, "Successfully logged in as ${user.fullName}!", Toast.LENGTH_LONG).show()
-                    showPage(HOME_PAGE)
-                } else {
-                    // Failed login
-                    Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
+                // Show progress indicator
+                Toast.makeText(this, "Checking credentials...", Toast.LENGTH_SHORT).show()
+                
+                // Check MongoDB for user credentials
+                executor.execute {
+                    try {
+                        val isValid = mongoConnector.validateUser(email, password)
+                        runOnUiThread {
+                            if (isValid) {
+                                // Successful login
+                                Toast.makeText(this, "Successfully logged in as $email!", Toast.LENGTH_LONG).show()
+                                showPage(HOME_PAGE)
+                            } else {
+                                // Failed login
+                                Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        runOnUiThread {
+                            Toast.makeText(this, "Login error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
         }
@@ -220,37 +181,32 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
                 }
                 else -> {
-                    // Check if email already exists
-                    val existingUser = users.find { it.email == email }
+                    // Show progress indicator
+                    Toast.makeText(this, "Creating account...", Toast.LENGTH_SHORT).show()
                     
-                    if (existingUser != null) {
-                        Toast.makeText(this, "Email already registered", Toast.LENGTH_SHORT).show()
-                    } else {
-                        // Create new user
-                        val newUser = UserCredential(email, fullName, password)
-                        
+                    // Create user in MongoDB
+                    executor.execute {
                         try {
-                            // Add to in-memory list
-                            users.add(newUser)
-                            
-                            // Save to internal storage
-                            saveUserCredentials()
-                            
-                            // Verify the data was saved
-                            verifyUserSaved(email)
-                            
-                            // Clear input fields
-                            emailInput.text.clear()
-                            nameInput.text.clear()
-                            passwordInput.text.clear()
-                            confirmPasswordInput.text.clear()
-                            
-                            Toast.makeText(this, "Account created successfully!", Toast.LENGTH_LONG).show()
-                            showPage(LOGIN_PAGE)
+                            val success = mongoConnector.createUser(email, fullName, password)
+                            runOnUiThread {
+                                if (success) {
+                                    // Clear input fields
+                                    emailInput.text.clear()
+                                    nameInput.text.clear()
+                                    passwordInput.text.clear()
+                                    confirmPasswordInput.text.clear()
+                                    
+                                    Toast.makeText(this, "Account created successfully!", Toast.LENGTH_LONG).show()
+                                    showPage(LOGIN_PAGE)
+                                } else {
+                                    Toast.makeText(this, "Failed to create account. Email may already be registered.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
                         } catch (e: Exception) {
-                            // Remove from memory if save failed
-                            users.remove(newUser)
-                            Toast.makeText(this, "Error creating account: ${e.message}", Toast.LENGTH_SHORT).show()
+                            e.printStackTrace()
+                            runOnUiThread {
+                                Toast.makeText(this, "Error creating account: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
@@ -261,42 +217,4 @@ class MainActivity : AppCompatActivity() {
             showPage(LOGIN_PAGE)
         }
     }
-    
-    private fun verifyUserSaved(email: String) {
-        try {
-            // Check if the file exists in internal storage
-            val internalFile = File(filesDir, "users.json")
-            if (internalFile.exists()) {
-                val jsonString = internalFile.readText()
-                val jsonObject = JSONObject(jsonString)
-                val usersArray = jsonObject.getJSONArray("users")
-                
-                var found = false
-                for (i in 0 until usersArray.length()) {
-                    val userObj = usersArray.getJSONObject(i)
-                    if (userObj.getString("email") == email) {
-                        found = true
-                        break
-                    }
-                }
-                
-                if (found) {
-                    Toast.makeText(this, "Verified: User saved to storage successfully", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Warning: User not found in saved file", Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                Toast.makeText(this, "Warning: Internal storage file not created", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error verifying user: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-    
-    // Data class to hold user credentials
-    data class UserCredential(
-        val email: String,
-        val fullName: String,
-        val password: String
-    )
 }
