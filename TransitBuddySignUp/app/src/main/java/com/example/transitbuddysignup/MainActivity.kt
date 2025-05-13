@@ -8,7 +8,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
+import java.io.FileWriter
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private val HOME_PAGE = 3
     
     // User credentials
-    private var users: List<UserCredential> = emptyList()
+    private var users: MutableList<UserCredential> = mutableListOf()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     
     private fun loadUserCredentials() {
         try {
+            // First load default users from assets
             val jsonString = assets.open("users.json").bufferedReader().use { it.readText() }
             val jsonObject = JSONObject(jsonString)
             val usersArray = jsonObject.getJSONArray("users")
@@ -50,8 +54,62 @@ class MainActivity : AppCompatActivity() {
             }
             
             users = usersList
+            
+            // Then check for users in internal storage and add them
+            val internalFile = File(filesDir, "users.json")
+            if (internalFile.exists()) {
+                try {
+                    val internalJsonString = internalFile.readText()
+                    val internalJsonObject = JSONObject(internalJsonString)
+                    val internalUsersArray = internalJsonObject.getJSONArray("users")
+                    
+                    for (i in 0 until internalUsersArray.length()) {
+                        val userObj = internalUsersArray.getJSONObject(i)
+                        val email = userObj.getString("email")
+                        val fullName = userObj.getString("fullName")
+                        val password = userObj.getString("password")
+                        
+                        // Only add if not already in the list
+                        if (users.none { it.email == email }) {
+                            users.add(UserCredential(email, fullName, password))
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Ignore errors reading internal file
+                }
+            }
         } catch (e: IOException) {
             Toast.makeText(this, "Error loading user credentials", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun saveUserCredentials() {
+        try {
+            // Create JSON object from users list
+            val jsonObject = JSONObject()
+            val jsonArray = JSONArray()
+            
+            for (user in users) {
+                val userObject = JSONObject()
+                userObject.put("email", user.email)
+                userObject.put("fullName", user.fullName)
+                userObject.put("password", user.password)
+                jsonArray.put(userObject)
+            }
+            
+            jsonObject.put("users", jsonArray)
+            
+            // Create/overwrite the JSON file in internal storage since we can't write to assets directly
+            val file = File(filesDir, "users.json")
+            FileWriter(file).use { it.write(jsonObject.toString()) }
+            
+            // Copy the file to assets directory during next app startup
+            // Note: Can't directly write to assets at runtime, this is a workaround
+            // A real app would use a database like Room or Firebase
+            
+            Toast.makeText(this, "User credentials saved successfully", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error saving user credentials: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
     
@@ -110,6 +168,7 @@ class MainActivity : AppCompatActivity() {
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             } else {
+                // Check against users list (which now includes both asset and internal storage users)
                 val user = users.find { it.email == email && it.password == password }
                 if (user != null) {
                     // Successful login
@@ -128,15 +187,62 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun setupSignupButtons() {
+        // Get signup input fields
+        val emailInput = findViewById<EditText>(R.id.email_input)
+        val nameInput = findViewById<EditText>(R.id.name_input)
+        val passwordInput = findViewById<EditText>(R.id.password_input)
+        val confirmPasswordInput = findViewById<EditText>(R.id.confirmpassword_input)
+        
         // Signup page buttons
         findViewById<Button>(R.id.signup_btn).setOnClickListener {
-            // In a real app, we would create a new account here
-            // For now, just pretend signup was successful
-            Toast.makeText(this, "Account created successfully!", Toast.LENGTH_LONG).show()
-            showPage(LOGIN_PAGE)
+            val email = emailInput.text.toString().trim()
+            val fullName = nameInput.text.toString().trim()
+            val password = passwordInput.text.toString()
+            val confirmPassword = confirmPasswordInput.text.toString()
+            
+            // Validate input
+            when {
+                email.isEmpty() || fullName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
+                    Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                }
+                password != confirmPassword -> {
+                    Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    // Check if email already exists
+                    val existingUser = users.find { it.email == email }
+                    
+                    if (existingUser != null) {
+                        Toast.makeText(this, "Email already registered", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Create new user
+                        val newUser = UserCredential(email, fullName, password)
+                        
+                        try {
+                            // Add to in-memory list
+                            users.add(newUser)
+                            
+                            // Save to internal storage
+                            saveUserCredentials()
+                            
+                            // Clear input fields
+                            emailInput.text.clear()
+                            nameInput.text.clear()
+                            passwordInput.text.clear()
+                            confirmPasswordInput.text.clear()
+                            
+                            Toast.makeText(this, "Account created successfully!", Toast.LENGTH_LONG).show()
+                            showPage(LOGIN_PAGE)
+                        } catch (e: Exception) {
+                            // Remove from memory if save failed
+                            users.remove(newUser)
+                            Toast.makeText(this, "Error creating account: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
         }
         
-        // Now we can use the ID for the login button
         findViewById<Button>(R.id.login_redirect_btn).setOnClickListener {
             showPage(LOGIN_PAGE)
         }
