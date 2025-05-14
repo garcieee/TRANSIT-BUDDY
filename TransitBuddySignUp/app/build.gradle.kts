@@ -1,14 +1,18 @@
 plugins {
-    alias(libs.plugins.android.application)
+    // Android Gradle plugin
+    id("com.android.application")
+    // Kotlin Android plugin
     alias(libs.plugins.kotlin.android)
+    // Google Services plugin
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.transitbuddysignup"
+    namespace = "com.example.transitbuddy"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.transitbuddysignup"
+        applicationId = "com.example.transitbuddy"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -48,8 +52,11 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     
-    // JSON parsing (for the static file-based approach)
-    implementation("org.json:json:20210307")
+    // Firebase dependencies
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-database-ktx") // Realtime Database
     
     // Testing dependencies
     testImplementation(libs.junit)
