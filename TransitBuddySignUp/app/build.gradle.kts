@@ -13,11 +13,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        
-        // Enable MultiDex - required for MongoDB driver
-        multiDexEnabled = true
     }
 
     buildTypes {
@@ -29,38 +25,18 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-        isCoreLibraryDesugaringEnabled = true
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
     
-    // Additional R8/D8 options for record desugaring
     buildFeatures {
         buildConfig = true
-    }
-    
-    packagingOptions {
-        resources {
-            excludes += listOf(
-                "META-INF/INDEX.LIST",
-                "META-INF/DEPENDENCIES",
-                "META-INF/LICENSE",
-                "META-INF/LICENSE.md",
-                "META-INF/license.txt",
-                "META-INF/NOTICE",
-                "META-INF/NOTICE.md",
-                "META-INF/notice.txt",
-                "META-INF/ASL2.0",
-                "META-INF/native-image/org.mongodb/bson/native-image.properties"
-            )
-            pickFirsts += listOf(
-                "META-INF/native-image/org.mongodb/bson/native-image.properties"
-            )
-        }
     }
 }
 
@@ -72,23 +48,11 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     
-    // MongoDB dependencies - simple configuration without record codec
-    implementation("org.mongodb:mongodb-driver-sync:4.4.2") {
-        // Exclude problematic modules
-        exclude(group = "org.mongodb", module = "bson-record-codec")
-    }
-    
-    // JNDI API for MongoDB SRV connections
-    implementation("com.sun.mail:javax.mail:1.6.2")
-    
-    // Multidex support (required for large number of methods)
-    implementation("androidx.multidex:multidex:2.0.1")
-    
-    // Core library desugaring (for Java 8+ features)
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    // JSON parsing (for the static file-based approach)
+    implementation("org.json:json:20210307")
     
     // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-}
+} 

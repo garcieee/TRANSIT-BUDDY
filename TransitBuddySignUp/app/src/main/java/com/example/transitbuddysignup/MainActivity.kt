@@ -1,7 +1,6 @@
 package com.example.transitbuddysignup
 
 import android.os.Bundle
-import android.os.StrictMode
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -9,8 +8,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.transitbuddysignup.db.MongoConnector
-import java.util.concurrent.Executors
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     
@@ -19,20 +21,15 @@ class MainActivity : AppCompatActivity() {
     private val SIGNUP_PAGE = 2
     private val HOME_PAGE = 3
     
-    // MongoDB connector
-    private lateinit var mongoConnector: MongoConnector
-    private val executor = Executors.newSingleThreadExecutor()
+    // In-memory list of user credentials
+    private var users = mutableListOf<UserCredential>()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Allow network on main thread temporarily during development
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-        
-        // Get MongoDB connector instance (initialization is handled in Application class)
-        mongoConnector = MongoConnector.getInstance()
+        // Load user credentials from assets and internal storage
+        loadUserCredentials()
         
         // Start with landing page first
         showPage(LANDING_PAGE)
@@ -106,10 +103,6 @@ class MainActivity : AppCompatActivity() {
             val file = File(filesDir, "users.json")
             FileWriter(file).use { it.write(jsonObject.toString()) }
             
-            // Copy the file to assets directory during next app startup
-            // Note: Can't directly write to assets at runtime, this is a workaround
-            // A real app would use a database like Room or Firebase
-            
             Toast.makeText(this, "User credentials saved successfully", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(this, "Error saving user credentials: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -171,40 +164,16 @@ class MainActivity : AppCompatActivity() {
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             } else {
-                // Show progress indicator
-                Toast.makeText(this, "Checking credentials...", Toast.LENGTH_SHORT).show()
+                // Check local credentials instead of MongoDB
+                val user = users.find { it.email == email && it.password == password }
                 
-                // Check MongoDB for user credentials
-                executor.execute {
-                    try {
-                        // Ensure MongoDB is initialized before trying to validate
-                        if (!mongoConnector.isConnected()) {
-                            val initialized = mongoConnector.initialize(applicationContext)
-                            if (!initialized) {
-                                runOnUiThread {
-                                    Toast.makeText(this, "Could not connect to database. Please restart the app.", Toast.LENGTH_LONG).show()
-                                }
-                                return@execute
-                            }
-                        }
-                        
-                        val isValid = mongoConnector.validateUser(email, password)
-                        runOnUiThread {
-                            if (isValid) {
-                                // Successful login
-                                Toast.makeText(this, "Successfully logged in as $email!", Toast.LENGTH_LONG).show()
-                                showPage(HOME_PAGE)
-                            } else {
-                                // Failed login
-                                Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        runOnUiThread {
-                            Toast.makeText(this, "Login error: ${e.message}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                if (user != null) {
+                    // Successful login
+                    Toast.makeText(this, "Successfully logged in as ${user.email}!", Toast.LENGTH_LONG).show()
+                    showPage(HOME_PAGE)
+                } else {
+                    // Failed login
+                    Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -236,37 +205,34 @@ class MainActivity : AppCompatActivity() {
                 password != confirmPassword -> {
                     Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
                 }
+                users.any { it.email == email } -> {
+                    Toast.makeText(this, "Email already registered", Toast.LENGTH_SHORT).show()
+                }
                 else -> {
                     // Show progress indicator
                     Toast.makeText(this, "Creating account...", Toast.LENGTH_SHORT).show()
                     
-                    if (existingUser != null) {
-                        Toast.makeText(this, "Email already registered", Toast.LENGTH_SHORT).show()
-                    } else {
-                        // Create new user
-                        val newUser = UserCredential(email, fullName, password)
+                    // Create new user
+                    val newUser = UserCredential(email, fullName, password)
+                    
+                    try {
+                        // Add to in-memory list
+                        users.add(newUser)
                         
-                        try {
-                            // Add to in-memory list
-                            users.add(newUser)
-                            
-                            // Save to internal storage
-                            saveUserCredentials()
-                            
-                            // Clear input fields
-                            emailInput.text.clear()
-                            nameInput.text.clear()
-                            passwordInput.text.clear()
-                            confirmPasswordInput.text.clear()
-                            
-                            Toast.makeText(this, "Account created successfully!", Toast.LENGTH_LONG).show()
-                            showPage(LOGIN_PAGE)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            runOnUiThread {
-                                Toast.makeText(this, "Error creating account: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                        // Save to internal storage
+                        saveUserCredentials()
+                        
+                        // Clear input fields
+                        emailInput.text.clear()
+                        nameInput.text.clear()
+                        passwordInput.text.clear()
+                        confirmPasswordInput.text.clear()
+                        
+                        Toast.makeText(this, "Account created successfully!", Toast.LENGTH_LONG).show()
+                        showPage(LOGIN_PAGE)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Toast.makeText(this, "Error creating account: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
