@@ -20,6 +20,7 @@
             android:layout_gravity="center" />
 
         <TextView
+            android:id="@+id/landing_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Transit Buddy"
@@ -58,5 +59,17 @@
             android:textSize="20sp"
             android:fontFamily="@font/red_hat_display_bold"
             android:backgroundTint="@color/white" />
+
+        <Button
+            android:id="@+id/btn_test_connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:padding="10dp"
+            android:text="Test Firebase Connection"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:fontFamily="@font/red_hat_display_bold"
+            android:backgroundTint="#2196F3" />
     </LinearLayout>
 </RelativeLayout>
