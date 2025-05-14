@@ -132,6 +132,17 @@ class MainActivity : AppCompatActivity() {
                 // Check MongoDB for user credentials
                 executor.execute {
                     try {
+                        // Ensure MongoDB is initialized before trying to validate
+                        if (!mongoConnector.isConnected()) {
+                            val initialized = mongoConnector.initialize(applicationContext)
+                            if (!initialized) {
+                                runOnUiThread {
+                                    Toast.makeText(this, "Could not connect to database. Please restart the app.", Toast.LENGTH_LONG).show()
+                                }
+                                return@execute
+                            }
+                        }
+                        
                         val isValid = mongoConnector.validateUser(email, password)
                         runOnUiThread {
                             if (isValid) {
@@ -187,6 +198,17 @@ class MainActivity : AppCompatActivity() {
                     // Create user in MongoDB
                     executor.execute {
                         try {
+                            // Ensure MongoDB is initialized before trying to create user
+                            if (!mongoConnector.isConnected()) {
+                                val initialized = mongoConnector.initialize(applicationContext)
+                                if (!initialized) {
+                                    runOnUiThread {
+                                        Toast.makeText(this, "Could not connect to database. Please restart the app.", Toast.LENGTH_LONG).show()
+                                    }
+                                    return@execute
+                                }
+                            }
+                            
                             val success = mongoConnector.createUser(email, fullName, password)
                             runOnUiThread {
                                 if (success) {

@@ -78,6 +78,9 @@ dependencies {
         exclude(group = "org.mongodb", module = "bson-record-codec")
     }
     
+    // JNDI API for MongoDB SRV connections
+    implementation("com.sun.mail:javax.mail:1.6.2")
+    
     // Multidex support (required for large number of methods)
     implementation("androidx.multidex:multidex:2.0.1")
     
