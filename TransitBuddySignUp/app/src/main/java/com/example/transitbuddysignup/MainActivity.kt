@@ -40,9 +40,25 @@ class MainActivity : AppCompatActivity() {
     
     private fun loadUserCredentials() {
         try {
+            // First load default users from assets
+            val jsonString = assets.open("users.json").bufferedReader().use { it.readText() }
+            val jsonObject = JSONObject(jsonString)
+            val usersArray = jsonObject.getJSONArray("users")
+            
             val usersList = mutableListOf<UserCredential>()
             
-            // First check for users in internal storage
+            for (i in 0 until usersArray.length()) {
+                val userObj = usersArray.getJSONObject(i)
+                val email = userObj.getString("email")
+                val fullName = userObj.getString("fullName")
+                val password = userObj.getString("password")
+                
+                usersList.add(UserCredential(email, fullName, password))
+            }
+            
+            users = usersList
+            
+            // Then check for users in internal storage and add them
             val internalFile = File(filesDir, "users.json")
             if (internalFile.exists()) {
                 try {
@@ -56,43 +72,17 @@ class MainActivity : AppCompatActivity() {
                         val fullName = userObj.getString("fullName")
                         val password = userObj.getString("password")
                         
-                        usersList.add(UserCredential(email, fullName, password))
+                        // Only add if not already in the list
+                        if (users.none { it.email == email }) {
+                            users.add(UserCredential(email, fullName, password))
+                        }
                     }
-                    
-                    Toast.makeText(this, "Loaded ${usersList.size} users from local storage", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
-                    e.printStackTrace()
-                    Toast.makeText(this, "Error reading internal file: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                // If internal file doesn't exist, load default users from assets
-                try {
-                    val jsonString = assets.open("users.json").bufferedReader().use { it.readText() }
-                    val jsonObject = JSONObject(jsonString)
-                    val usersArray = jsonObject.getJSONArray("users")
-                    
-                    for (i in 0 until usersArray.length()) {
-                        val userObj = usersArray.getJSONObject(i)
-                        val email = userObj.getString("email")
-                        val fullName = userObj.getString("fullName")
-                        val password = userObj.getString("password")
-                        
-                        usersList.add(UserCredential(email, fullName, password))
-                    }
-                    
-                    // Save the assets users to internal storage for future updates
-                    users = usersList
-                    saveUserCredentials()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Toast.makeText(this, "Error loading default users: ${e.message}", Toast.LENGTH_SHORT).show()
+                    // Ignore errors reading internal file
                 }
             }
-            
-            users = usersList
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Error loading user credentials: ${e.message}", Toast.LENGTH_SHORT).show()
+        } catch (e: IOException) {
+            Toast.makeText(this, "Error loading user credentials", Toast.LENGTH_SHORT).show()
         }
     }
     
@@ -114,16 +104,15 @@ class MainActivity : AppCompatActivity() {
             
             // Create/overwrite the JSON file in internal storage since we can't write to assets directly
             val file = File(filesDir, "users.json")
-            val writer = FileWriter(file)
-            writer.write(jsonObject.toString())
-            writer.flush()
-            writer.close()
+            FileWriter(file).use { it.write(jsonObject.toString()) }
             
-            // Debug message to show file location
-            Toast.makeText(this, "User saved to: ${file.absolutePath}", Toast.LENGTH_LONG).show()
+            // Copy the file to assets directory during next app startup
+            // Note: Can't directly write to assets at runtime, this is a workaround
+            // A real app would use a database like Room or Firebase
+            
+            Toast.makeText(this, "User credentials saved successfully", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(this, "Error saving user credentials: ${e.message}", Toast.LENGTH_SHORT).show()
-            e.printStackTrace() // Log the error
         }
     }
     
@@ -264,9 +253,6 @@ class MainActivity : AppCompatActivity() {
                             // Save to internal storage
                             saveUserCredentials()
                             
-                            // Verify the data was saved
-                            verifyUserSaved(email)
-                            
                             // Clear input fields
                             emailInput.text.clear()
                             nameInput.text.clear()
@@ -288,37 +274,6 @@ class MainActivity : AppCompatActivity() {
         
         findViewById<Button>(R.id.login_redirect_btn).setOnClickListener {
             showPage(LOGIN_PAGE)
-        }
-    }
-    
-    private fun verifyUserSaved(email: String) {
-        try {
-            // Check if the file exists in internal storage
-            val internalFile = File(filesDir, "users.json")
-            if (internalFile.exists()) {
-                val jsonString = internalFile.readText()
-                val jsonObject = JSONObject(jsonString)
-                val usersArray = jsonObject.getJSONArray("users")
-                
-                var found = false
-                for (i in 0 until usersArray.length()) {
-                    val userObj = usersArray.getJSONObject(i)
-                    if (userObj.getString("email") == email) {
-                        found = true
-                        break
-                    }
-                }
-                
-                if (found) {
-                    Toast.makeText(this, "Verified: User saved to storage successfully", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Warning: User not found in saved file", Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                Toast.makeText(this, "Warning: Internal storage file not created", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error verifying user: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
     
