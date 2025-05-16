@@ -248,58 +248,37 @@ class MainActivity : AppCompatActivity() {
                     // Data saved successfully
                 }
                 .addOnFailureListener { e ->
-                    showToast("Failed to save user info: ${e.message}")
+                    Log.e(TAG, "Error saving user data", e)
                 }
         }
-    }
-    
-    private fun getUserProfile(userId: String, callback: (Map<String, Any>?) -> Unit) {
-        database.child("users").child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    // Convert to Map
-                    val userData = snapshot.value as? Map<String, Any>
-                    callback(userData)
-                } else {
-                    callback(null)
-                }
-            }
-            
-            override fun onCancelled(error: DatabaseError) {
-                showToast("Failed to get user data: ${error.message}")
-                callback(null)
-            }
-        })
     }
     
     //endregion
     
-    //region UI Setup & Navigation
+    //region UI Logic
     
-    private fun showPage(page: Int) {
-        when (page) {
-            LANDING_PAGE -> {
-                setContentView(R.layout.activity_landing)
-                setupLandingButtons()
-            }
-            LOGIN_PAGE -> {
-                setContentView(R.layout.activity_login)
-                setupLoginButtons()
-            }
-            SIGNUP_PAGE -> {
-                setContentView(R.layout.activity_main) // This is the signup layout
-                setupSignupButtons()
-            }
-            HOME_PAGE -> {
-                setContentView(R.layout.activity_landing) // Replace with actual home page layout when created
-                setupHomePage()
-            }
+    private fun showPage(pageId: Int) {
+        val layoutResId = when (pageId) {
+            LANDING_PAGE -> R.layout.activity_landing
+            LOGIN_PAGE -> R.layout.activity_login
+            SIGNUP_PAGE -> R.layout.activity_main
+            HOME_PAGE -> R.layout.activity_home
+            else -> throw IllegalArgumentException("Unknown page ID: $pageId")
         }
         
-        setupWindowInsets()
+        setContentView(layoutResId)
+        setupPageUI(pageId)
     }
     
-    private fun setupWindowInsets() {
+    private fun setupPageUI(pageId: Int) {
+        when (pageId) {
+            LANDING_PAGE -> setupLandingPage()
+            LOGIN_PAGE -> setupLoginPage()
+            SIGNUP_PAGE -> setupSignupPage()
+            HOME_PAGE -> setupHomePage()
+        }
+        
+        // Common UI setup for all pages
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -307,45 +286,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    private fun setupHomePage() {
-        val currentUser = auth.currentUser
-        
-        // Change landing page text & buttons for home page functionality
-        val titleTextView = findViewById<TextView>(R.id.landing_title)
-        if (currentUser != null) {
-            updateWelcomeMessage(currentUser.uid, titleTextView)
-        }
-        
-        // Setup profile button
-        val loginButton = findViewById<Button>(R.id.btn_login)
-        loginButton.text = "My Profile"
-        loginButton.setOnClickListener {
-            showToast("Profile feature coming soon!")
-        }
-        
-        // Setup sign out button
-        val signupButton = findViewById<Button>(R.id.btn_signup)
-        signupButton.text = "Sign Out"
-        signupButton.setOnClickListener {
-            signOut()
-        }
-        
-        // Setup test connection button
-        findViewById<Button>(R.id.btn_test_connection)?.setOnClickListener {
-            testFirebaseConnection()
-        }
-    }
-    
-    private fun updateWelcomeMessage(userId: String, titleTextView: TextView) {
-        getUserProfile(userId) { userData ->
-            if (userData != null) {
-                val fullName = userData["fullName"] as? String ?: "User"
-                titleTextView.text = "Welcome, $fullName"
-            }
-        }
-    }
-    
-    private fun setupLandingButtons() {
+    private fun setupLandingPage() {
         findViewById<Button>(R.id.btn_login).setOnClickListener {
             showPage(LOGIN_PAGE)
         }
@@ -354,69 +295,72 @@ class MainActivity : AppCompatActivity() {
             showPage(SIGNUP_PAGE)
         }
         
-        // Test Firebase Connection button
-        findViewById<Button>(R.id.btn_test_connection)?.setOnClickListener {
+        findViewById<Button>(R.id.btn_test_connection).setOnClickListener {
             testFirebaseConnection()
         }
     }
     
-    private fun setupLoginButtons() {
-        // Get input fields
+    private fun setupLoginPage() {
         emailInput = findViewById(R.id.email_input)
         passwordInput = findViewById(R.id.password_input)
         
-        // Setup forgot password functionality
-        val forgotPasswordBtn = findViewById<TextView>(R.id.signup_redirect_btn)
-        forgotPasswordBtn.setOnClickListener {
+        findViewById<Button>(R.id.login_btn).setOnClickListener {
+            authenticateUser(emailInput.text.toString().trim(), passwordInput.text.toString())
+        }
+        
+        findViewById<TextView>(R.id.forgot_password).setOnClickListener {
             showForgotPasswordDialog()
         }
         
-        // Login button
-        findViewById<Button>(R.id.login_btn).setOnClickListener {
-            val email = emailInput.text.toString().trim()
-            val password = passwordInput.text.toString()
-            authenticateUser(email, password)
-        }
-        
-        // Redirect to signup
         findViewById<Button>(R.id.signup_redirect_btn).setOnClickListener {
             showPage(SIGNUP_PAGE)
         }
     }
     
-    private fun setupSignupButtons() {
-        // Get signup input fields
-        emailInput = findViewById(R.id.email_input)
-        val nameInput = findViewById<EditText>(R.id.name_input)
-        passwordInput = findViewById(R.id.password_input)
-        val confirmPasswordInput = findViewById<EditText>(R.id.confirmpassword_input)
-        
-        // Signup button
+    private fun setupSignupPage() {
         findViewById<Button>(R.id.signup_btn).setOnClickListener {
-            val email = emailInput.text.toString().trim()
-            val fullName = nameInput.text.toString().trim()
-            val password = passwordInput.text.toString()
-            val confirmPassword = confirmPasswordInput.text.toString()
+            val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
+            val fullName = findViewById<EditText>(R.id.name_input).text.toString().trim()
+            val password = findViewById<EditText>(R.id.password_input).text.toString()
+            val confirmPassword = findViewById<EditText>(R.id.confirmpassword_input).text.toString()
             
             createUser(email, fullName, password, confirmPassword)
         }
         
-        // Redirect to login
         findViewById<Button>(R.id.login_redirect_btn).setOnClickListener {
             showPage(LOGIN_PAGE)
         }
     }
     
-    private fun clearSignupFields() {
-        val emailInput = findViewById<EditText>(R.id.email_input)
-        val nameInput = findViewById<EditText>(R.id.name_input)
-        val passwordInput = findViewById<EditText>(R.id.password_input)
-        val confirmPasswordInput = findViewById<EditText>(R.id.confirmpassword_input)
+    private fun setupHomePage() {
+        val currentUser = auth.currentUser
+        findViewById<TextView>(R.id.txt_welcome).text = "Welcome, ${currentUser?.email}"
         
-        emailInput.text.clear()
-        nameInput.text.clear()
-        passwordInput.text.clear()
-        confirmPasswordInput.text.clear()
+        findViewById<Button>(R.id.btn_sign_out).setOnClickListener {
+            signOut()
+        }
+        
+        // Load and display user data
+        loadUserData()
+    }
+    
+    private fun loadUserData() {
+        val userId = auth.currentUser?.uid ?: return
+        
+        database.child("users").child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val fullName = snapshot.child("fullName").getValue(String::class.java)
+                val email = snapshot.child("email").getValue(String::class.java)
+                
+                // Update UI with user data
+                findViewById<TextView>(R.id.txt_user_details).text = "Name: $fullName\nEmail: $email"
+            }
+            
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Error loading user data", error.toException())
+                showToast("Failed to load user data")
+            }
+        })
     }
     
     //endregion
@@ -426,34 +370,29 @@ class MainActivity : AppCompatActivity() {
     private fun showEmailVerificationDialog() {
         AlertDialog.Builder(this)
             .setTitle("Email Verification Required")
-            .setMessage("Please verify your email address before logging in. Check your inbox.")
-            .setPositiveButton("Resend Email") { _, _ ->
-                resendVerificationEmail()
-            }
+            .setMessage("Please verify your email address by clicking the link in the verification email we sent you.")
+            .setPositiveButton("Resend Email") { _, _ -> resendVerificationEmail() }
             .setNegativeButton("OK", null)
             .show()
     }
     
     private fun showVerificationEmailSentDialog() {
         AlertDialog.Builder(this)
-            .setTitle("Verify Your Email")
-            .setMessage("A verification email has been sent to your email address. Please verify before logging in.")
-            .setPositiveButton("OK") { _, _ ->
-                showPage(LOGIN_PAGE)
-            }
+            .setTitle("Verification Email Sent")
+            .setMessage("A verification email has been sent to your email address. Please verify your email to complete registration.")
+            .setPositiveButton("OK") { _, _ -> showPage(LOGIN_PAGE) }
             .setCancelable(false)
             .show()
     }
     
     private fun showForgotPasswordDialog() {
-        val builder = AlertDialog.Builder(this)
-        val inflater = LayoutInflater.from(this)
-        val view = inflater.inflate(R.layout.dialog_forgot_password, null)
-        val emailInput = view.findViewById<EditText>(R.id.email_input)
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_forgot_password, null)
+        val emailInput = dialogView.findViewById<EditText>(R.id.email_input)
         
-        builder.setView(view)
-            .setTitle("Reset Password")
-            .setPositiveButton("Reset") { _, _ ->
+        AlertDialog.Builder(this)
+            .setTitle("Forgot Password")
+            .setView(dialogView)
+            .setPositiveButton("Reset Password") { _, _ ->
                 val email = emailInput.text.toString().trim()
                 if (email.isNotEmpty()) {
                     resetPassword(email)
@@ -467,68 +406,7 @@ class MainActivity : AppCompatActivity() {
     
     //endregion
     
-    //region Utility Methods
-    
-    private fun testFirebaseConnection() {
-        if (!isNetworkAvailable()) {
-            showToast("No internet connection available")
-            return
-        }
-        
-        showProgress()
-        // Test database connectivity
-        val testRef = Firebase.database.getReference(".info/connected")
-        testRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val connected = snapshot.getValue(Boolean::class.java) ?: false
-                if (connected) {
-                    showToast("Firebase connection successful!")
-                    // Log Firebase details for debugging
-                    logFirebaseInfo()
-                } else {
-                    showToast("Firebase connection issue detected")
-                }
-                hideProgress()
-            }
-            
-            override fun onCancelled(error: DatabaseError) {
-                showToast("Firebase test failed: ${error.message}")
-                hideProgress()
-            }
-        })
-    }
-    
-    private fun logFirebaseInfo() {
-        try {
-            val currentUser = auth.currentUser
-            val userId = currentUser?.uid ?: "Not logged in"
-            val email = currentUser?.email ?: "No email"
-            val isVerified = currentUser?.isEmailVerified ?: false
-            val dbURL = Firebase.database.reference.toString()
-            
-            Log.d(TAG, "===== FIREBASE INFO =====")
-            Log.d(TAG, "User ID: $userId")
-            Log.d(TAG, "Email: $email")
-            Log.d(TAG, "Verified: $isVerified")
-            Log.d(TAG, "DB URL: $dbURL")
-            Log.d(TAG, "=======================")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error logging Firebase info", e)
-        }
-    }
-    
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-            return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        } else {
-            val networkInfo = connectivityManager.activeNetworkInfo
-            return networkInfo != null && networkInfo.isConnected
-        }
-    }
+    //region Helper Methods
     
     private fun showToast(message: String, duration: Int = SHORT_DURATION) {
         Toast.makeText(this, message, duration).show()
@@ -539,7 +417,77 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun hideProgress() {
-        progressDialog.dismiss()
+        if (progressDialog.isShowing) {
+            progressDialog.dismiss()
+        }
     }
     
-}
+    private fun clearSignupFields() {
+        findViewById<EditText>(R.id.email_input).text.clear()
+        findViewById<EditText>(R.id.name_input).text.clear()
+        findViewById<EditText>(R.id.password_input).text.clear()
+        findViewById<EditText>(R.id.confirmpassword_input).text.clear()
+    }
+    
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        } else {
+            @Suppress("DEPRECATION")
+            val networkInfo = connectivityManager.activeNetworkInfo
+            @Suppress("DEPRECATION")
+            return networkInfo != null && networkInfo.isConnected
+        }
+    }
+    
+    //endregion
+    
+    //region Firebase Connection Test
+    
+    private fun testFirebaseConnection() {
+        if (!isNetworkAvailable()) {
+            showToast("No internet connection available")
+            return
+        }
+        
+        showProgress()
+        
+        // Test Firebase connectivity by attempting to access the database
+        val testRef = Firebase.database.getReference(".info/connected")
+        testRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                hideProgress()
+                val isConnected = snapshot.getValue(Boolean::class.java) ?: false
+                showFirebaseConnectionResult(isConnected)
+            }
+            
+            override fun onCancelled(error: DatabaseError) {
+                hideProgress()
+                showFirebaseConnectionResult(false, error.message)
+            }
+        })
+    }
+    
+    private fun showFirebaseConnectionResult(isConnected: Boolean, errorMessage: String? = null) {
+        val title = if (isConnected) "Connection Successful" else "Connection Failed"
+        val message = if (isConnected) {
+            "Successfully connected to Firebase!"
+        } else {
+            "Failed to connect to Firebase. ${errorMessage ?: "Please check your internet connection and Firebase configuration."}"
+        }
+        
+        val icon = if (isConnected) android.R.drawable.ic_dialog_info else android.R.drawable.ic_dialog_alert
+        
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setIcon(icon)
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
+} 
