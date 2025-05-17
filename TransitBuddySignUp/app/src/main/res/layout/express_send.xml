@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/bgImage"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/bgtop" />
+
+    <ImageButton
+        android:id="@+id/topLeftButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="15dp"
+        android:src="@drawable/baseline_dehaze_24"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside" />
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/red_hat_display_bold"
+        android:text="Express Send"
+        android:textSize="23sp"
+        android:gravity="center"
+        android:textColor="#f8f8f8"
+        android:layout_toEndOf="@id/topLeftButton"
+        android:layout_toStartOf="@id/notification"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_alignTop="@id/topLeftButton"
+        android:layout_alignBottom="@id/topLeftButton" />
+
+    <ImageButton
+        android:id="@+id/notification"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="15dp"
+        android:src="@drawable/baseline_notifications_24"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside" />
+
+    <LinearLayout
+        android:id="@+id/mainContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bgImage"
+        android:padding="32dp"
+        android:background="#f8f8f8"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send To"
+            android:fontFamily="@font/red_hat_display_bold"
+            android:textColor="#343341"
+            android:textSize="18sp"
+            android:layout_marginEnd="120dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:hint="Contact Number"
+                android:textColor="#343341"
+                android:fontFamily="@font/red_hat_display_bold"
+                android:textColorHint="#343341"
+                android:textSize="15sp"
+                android:background="@drawable/roundedcorner"
+                android:padding="15dp"
+                android:inputType="number"
+                android:id="@+id/contactNumber"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amount"
+            android:fontFamily="@font/red_hat_display_bold"
+            android:textColor="#343341"
+            android:textSize="18sp"
+            android:layout_marginEnd="120dp"
+            android:layout_marginTop="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:hint="Balance"
+                android:textColor="#343341"
+                android:fontFamily="@font/red_hat_display_bold"
+                android:textColorHint="#343341"
+                android:textSize="15sp"
+                android:background="@drawable/roundedcorner"
+                android:padding="15dp"
+                android:inputType="number"
+                android:id="@+id/amountNumber"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Available Balance: PHP"
+                android:fontFamily="@font/red_hat_display_regualr"
+                android:textColor="#343341"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/balance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:fontFamily="@font/red_hat_display_regualr"
+                android:text="00.00"
+                android:textColor="#343341"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Message: "
+            android:fontFamily="@font/red_hat_display_bold"
+            android:textColor="#343341"
+            android:textSize="18sp"
+            android:layout_marginEnd="120dp"
+            android:layout_marginTop="20dp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginTop="5dp"
+            android:hint="Message (Optional)"
+            android:textColor="#343341"
+            android:fontFamily="@font/red_hat_display_bold"
+            android:textColorHint="#343341"
+            android:textSize="15sp"
+            android:background="@drawable/roundedcorner"
+            android:padding="15dp"
+            android:inputType="text"
+            android:id="@+id/message"
+            android:gravity="start" />
+
+        <Button
+            android:id="@+id/sendButton"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/red_hat_display_regualr"
+            android:text="Send"
+            android:textColor="#f8f8f8"
+            android:layout_marginTop="25dp"
+            android:textSize="20sp"
+
+            android:backgroundTint="#343341" />
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>
