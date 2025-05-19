@@ -1,8 +1,9 @@
-package com.example.transitbuddy_AndroidApp
+package com.example.transitbuddy_AndroidApp.auth
 
 import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
@@ -13,53 +14,32 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.example.transitbuddy_AndroidApp.R
+import com.example.transitbuddy_AndroidApp.ui.MainUIActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-// Main Activity for Transit Buddy
-class MainActivity : AppCompatActivity() {
-    
+class AuthenticationModule : AppCompatActivity() {
     companion object {
-        private const val TAG = "MainActivity"
-        
-        // Page constants
-        private const val LANDING_PAGE = 0
-        private const val LOGIN_PAGE = 1
-        private const val SIGNUP_PAGE = 2
-        private const val HOME_PAGE = 3
-        
-        // Toast duration
+        private const val TAG = "AuthenticationModule"
         private const val SHORT_DURATION = Toast.LENGTH_SHORT
         private const val LONG_DURATION = Toast.LENGTH_LONG
     }
     
-    // Firebase Authentication
     private lateinit var auth: FirebaseAuth
     private val database = Firebase.database.reference
     private lateinit var progressDialog: ProgressDialog
     
-    // UI Views that we access frequently
-    private lateinit var emailInput: EditText
-    private lateinit var passwordInput: EditText
-    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        setContentView(R.layout.activity_landing)
         
         initFirebase()
         initProgressDialog()
-        
-        // Start with landing page first
-        showPage(LANDING_PAGE)
+        setupLandingPage()
     }
     
     override fun onStart() {
@@ -67,11 +47,8 @@ class MainActivity : AppCompatActivity() {
         checkUserAuthentication()
     }
     
-    //region Initialization
-    
     private fun initFirebase() {
         auth = Firebase.auth
-        // Persistence is already enabled in TransitBuddyApplication
     }
     
     private fun initProgressDialog() {
@@ -81,21 +58,58 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    //endregion
-    
-    //region Authentication Logic
-    
     private fun checkUserAuthentication() {
         val currentUser = auth.currentUser
         if (currentUser != null && currentUser.isEmailVerified) {
-            showPage(HOME_PAGE)
+            startActivity(Intent(this, MainUIActivity::class.java))
+            finish()
         }
     }
     
-    private fun signOut() {
-        auth.signOut()
-        showToast("Signed out successfully")
-        showPage(LANDING_PAGE)
+    private fun setupLandingPage() {
+        findViewById<Button>(R.id.btn_login).setOnClickListener {
+            setContentView(R.layout.activity_login)
+            setupLoginPage()
+        }
+        
+        findViewById<Button>(R.id.btn_signup).setOnClickListener {
+            setContentView(R.layout.activity_signup)
+            setupSignupPage()
+        }
+    }
+    
+    private fun setupLoginPage() {
+        val emailInput = findViewById<EditText>(R.id.email_input)
+        val passwordInput = findViewById<EditText>(R.id.password_input)
+        
+        findViewById<Button>(R.id.login_btn).setOnClickListener {
+            authenticateUser(emailInput.text.toString().trim(), passwordInput.text.toString())
+        }
+        
+        findViewById<TextView>(R.id.forgot_password).setOnClickListener {
+            showForgotPasswordDialog()
+        }
+        
+        findViewById<Button>(R.id.signup_redirect_btn).setOnClickListener {
+            setContentView(R.layout.activity_signup)
+            setupSignupPage()
+        }
+    }
+    
+    private fun setupSignupPage() {
+        findViewById<Button>(R.id.signup_btn).setOnClickListener {
+            val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
+            val fullName = findViewById<EditText>(R.id.name_input).text.toString().trim()
+            val password = findViewById<EditText>(R.id.password_input).text.toString()
+            val confirmPassword = findViewById<EditText>(R.id.confirmpassword_input).text.toString()
+            
+            createUser(email, fullName, password, confirmPassword)
+        }
+        
+        findViewById<Button>(R.id.login_redirect_btn).setOnClickListener {
+            setContentView(R.layout.activity_login)
+            setupLoginPage()
+        }
     }
     
     private fun authenticateUser(email: String, password: String) {
@@ -121,7 +135,7 @@ class MainActivity : AppCompatActivity() {
                         else -> "Authentication failed: ${task.exception?.message}"
                     }
                     showToast(errorMessage)
-                    Log.e("MainActivity", "Auth error", task.exception)
+                    Log.e(TAG, "Auth error", task.exception)
                 }
             }
     }
@@ -137,7 +151,8 @@ class MainActivity : AppCompatActivity() {
     private fun handleSuccessfulLogin() {
         val user = auth.currentUser
         if (user != null && user.isEmailVerified) {
-            showPage(HOME_PAGE)
+            startActivity(Intent(this, MainUIActivity::class.java))
+            finish()
         } else {
             auth.signOut()
             showEmailVerificationDialog()
@@ -176,6 +191,26 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
             else -> return true
+        }
+    }
+    
+    private fun saveUserInfoToDatabase(email: String, fullName: String) {
+        val user = auth.currentUser
+        if (user != null) {
+            val userId = user.uid
+            val userInfo = mapOf(
+                "email" to email,
+                "fullName" to fullName,
+                "createdAt" to System.currentTimeMillis()
+            )
+            
+            database.child("users").child(userId).setValue(userInfo)
+                .addOnSuccessListener {
+                    // Data saved successfully
+                }
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Error saving user data", e)
+                }
         }
     }
     
@@ -229,144 +264,6 @@ class MainActivity : AppCompatActivity() {
             }
     }
     
-    //endregion
-    
-    //region Database Operations
-    
-    private fun saveUserInfoToDatabase(email: String, fullName: String) {
-        val user = auth.currentUser
-        if (user != null) {
-            val userId = user.uid
-            val userInfo = mapOf(
-                "email" to email,
-                "fullName" to fullName,
-                "createdAt" to System.currentTimeMillis()
-            )
-            
-            database.child("users").child(userId).setValue(userInfo)
-                .addOnSuccessListener {
-                    // Data saved successfully
-                }
-                .addOnFailureListener { e ->
-                    Log.e(TAG, "Error saving user data", e)
-                }
-        }
-    }
-    
-    //endregion
-    
-    //region UI Logic
-    
-    private fun showPage(pageId: Int) {
-        val layoutResId = when (pageId) {
-            LANDING_PAGE -> R.layout.activity_landing
-            LOGIN_PAGE -> R.layout.activity_login
-            SIGNUP_PAGE -> R.layout.activity_main
-            HOME_PAGE -> R.layout.activity_home
-            else -> throw IllegalArgumentException("Unknown page ID: $pageId")
-        }
-        
-        setContentView(layoutResId)
-        setupPageUI(pageId)
-    }
-    
-    private fun setupPageUI(pageId: Int) {
-        when (pageId) {
-            LANDING_PAGE -> setupLandingPage()
-            LOGIN_PAGE -> setupLoginPage()
-            SIGNUP_PAGE -> setupSignupPage()
-            HOME_PAGE -> setupHomePage()
-        }
-        
-        // Common UI setup for all pages
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-    }
-    
-    private fun setupLandingPage() {
-        findViewById<Button>(R.id.btn_login).setOnClickListener {
-            showPage(LOGIN_PAGE)
-        }
-        
-        findViewById<Button>(R.id.btn_signup).setOnClickListener {
-            showPage(SIGNUP_PAGE)
-        }
-        
-        findViewById<Button>(R.id.btn_test_connection).setOnClickListener {
-            testFirebaseConnection()
-        }
-    }
-    
-    private fun setupLoginPage() {
-        emailInput = findViewById(R.id.email_input)
-        passwordInput = findViewById(R.id.password_input)
-        
-        findViewById<Button>(R.id.login_btn).setOnClickListener {
-            authenticateUser(emailInput.text.toString().trim(), passwordInput.text.toString())
-        }
-        
-        findViewById<TextView>(R.id.forgot_password).setOnClickListener {
-            showForgotPasswordDialog()
-        }
-        
-        findViewById<Button>(R.id.signup_redirect_btn).setOnClickListener {
-            showPage(SIGNUP_PAGE)
-        }
-    }
-    
-    private fun setupSignupPage() {
-        findViewById<Button>(R.id.signup_btn).setOnClickListener {
-            val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
-            val fullName = findViewById<EditText>(R.id.name_input).text.toString().trim()
-            val password = findViewById<EditText>(R.id.password_input).text.toString()
-            val confirmPassword = findViewById<EditText>(R.id.confirmpassword_input).text.toString()
-            
-            createUser(email, fullName, password, confirmPassword)
-        }
-        
-        findViewById<Button>(R.id.login_redirect_btn).setOnClickListener {
-            showPage(LOGIN_PAGE)
-        }
-    }
-    
-    private fun setupHomePage() {
-        val currentUser = auth.currentUser
-        findViewById<TextView>(R.id.txt_welcome).text = "Welcome, ${currentUser?.email}"
-        
-        findViewById<Button>(R.id.btn_sign_out).setOnClickListener {
-            signOut()
-        }
-        
-        // Load and display user data
-        loadUserData()
-    }
-    
-    private fun loadUserData() {
-        val userId = auth.currentUser?.uid ?: return
-        
-        database.child("users").child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val fullName = snapshot.child("fullName").getValue(String::class.java)
-                val email = snapshot.child("email").getValue(String::class.java)
-                
-                // Update UI with user data
-                findViewById<TextView>(R.id.txt_user_details).text = "Name: $fullName\nEmail: $email"
-            }
-            
-            override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Error loading user data", error.toException())
-                showToast("Failed to load user data")
-            }
-        })
-    }
-    
-    //endregion
-    
-    //region Dialogs
-    
     private fun showEmailVerificationDialog() {
         AlertDialog.Builder(this)
             .setTitle("Email Verification Required")
@@ -380,7 +277,10 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Verification Email Sent")
             .setMessage("A verification email has been sent to your email address. Please verify your email to complete registration.")
-            .setPositiveButton("OK") { _, _ -> showPage(LOGIN_PAGE) }
+            .setPositiveButton("OK") { _, _ -> 
+                setContentView(R.layout.activity_login)
+                setupLoginPage()
+            }
             .setCancelable(false)
             .show()
     }
@@ -403,10 +303,6 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("Cancel", null)
             .show()
     }
-    
-    //endregion
-    
-    //region Helper Methods
     
     private fun showToast(message: String, duration: Int = SHORT_DURATION) {
         Toast.makeText(this, message, duration).show()
@@ -443,51 +339,4 @@ class MainActivity : AppCompatActivity() {
             return networkInfo != null && networkInfo.isConnected
         }
     }
-    
-    //endregion
-    
-    //region Firebase Connection Test
-    
-    private fun testFirebaseConnection() {
-        if (!isNetworkAvailable()) {
-            showToast("No internet connection available")
-            return
-        }
-        
-        showProgress()
-        
-        // Test Firebase connectivity by attempting to access the database
-        val testRef = Firebase.database.getReference(".info/connected")
-        testRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                hideProgress()
-                val isConnected = snapshot.getValue(Boolean::class.java) ?: false
-                showFirebaseConnectionResult(isConnected)
-            }
-            
-            override fun onCancelled(error: DatabaseError) {
-                hideProgress()
-                showFirebaseConnectionResult(false, error.message)
-            }
-        })
-    }
-    
-    private fun showFirebaseConnectionResult(isConnected: Boolean, errorMessage: String? = null) {
-        val title = if (isConnected) "Connection Successful" else "Connection Failed"
-        val message = if (isConnected) {
-            "Successfully connected to Firebase!"
-        } else {
-            "Failed to connect to Firebase. ${errorMessage ?: "Please check your internet connection and Firebase configuration."}"
-        }
-        
-        val icon = if (isConnected) android.R.drawable.ic_dialog_info else android.R.drawable.ic_dialog_alert
-        
-        AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
-            .setIcon(icon)
-            .setPositiveButton("OK", null)
-            .show()
-    }
-
 } 
