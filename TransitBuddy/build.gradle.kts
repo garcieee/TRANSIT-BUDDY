@@ -12,3 +12,5 @@ plugins {
     alias(libs.plugins.firebase.crashlytics) apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
 }
+
+val sourceCompatibility by extra(JavaVersion.VERSION_21)
