@@ -30,6 +30,18 @@
             android:name=".ui.MainUIActivity"
             android:exported="false" />
             
+        <activity
+            android:name=".ui.ExpressSendActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.QRCodeScannerActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.HomeActivity"
+            android:exported="false" />
+            
     </application>
 
 </manifest>

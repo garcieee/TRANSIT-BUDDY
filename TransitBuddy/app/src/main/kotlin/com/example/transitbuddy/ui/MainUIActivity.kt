@@ -29,33 +29,44 @@ class MainUIActivity : AppCompatActivity() {
     private fun setupUI() {
         // Set up navigation buttons
         findViewById<Button>(R.id.btnTransfer).setOnClickListener {
-            // TODO: Navigate to TransferActivity
-            Toast.makeText(this, "Transfer feature coming soon!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, ExpressSendActivity::class.java)
+            startActivity(intent)
         }
 
         findViewById<Button>(R.id.btnReceive).setOnClickListener {
-            // TODO: Navigate to ReceiveActivity
-            Toast.makeText(this, "Receive feature coming soon!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, QRCodeScannerActivity::class.java)
+            startActivity(intent)
         }
 
         findViewById<Button>(R.id.btnProfile).setOnClickListener {
-            // TODO: Navigate to ProfileActivity
-            Toast.makeText(this, "Profile feature coming soon!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
         }
 
         findViewById<Button>(R.id.btnLandmarks).setOnClickListener {
-            // TODO: Navigate to LandmarksActivity
+            // TODO: Create LandmarksActivity
             Toast.makeText(this, "Landmarks feature coming soon!", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btnStations).setOnClickListener {
-            // TODO: Navigate to StationsActivity
+            // TODO: Create StationsActivity
             Toast.makeText(this, "Stations feature coming soon!", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btnLoadBalance).setOnClickListener {
-            // TODO: Navigate to LoadBalanceActivity
+            // TODO: Create LoadBalanceActivity
             Toast.makeText(this, "Load Balance feature coming soon!", Toast.LENGTH_SHORT).show()
+        }
+
+        // Set up sign out button
+        findViewById<Button>(R.id.btnSignOut).setOnClickListener {
+            auth.signOut()
+            Toast.makeText(this, "Signed out successfully", Toast.LENGTH_SHORT).show()
+            // Navigate back to authentication screen
+            val intent = Intent(this, AuthenticationModule::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
         }
     }
 
@@ -63,10 +74,24 @@ class MainUIActivity : AppCompatActivity() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val userRef = database.getReference("users").child(currentUser.uid)
-            userRef.get().addOnSuccessListener { snapshot ->
-                val fullName = snapshot.child("fullName").getValue(String::class.java)
-                findViewById<TextView>(R.id.tvWelcome).text = "Welcome, $fullName"
-            }
+            userRef.get()
+                .addOnSuccessListener { snapshot ->
+                    val fullName = snapshot.child("fullName").getValue(String::class.java)
+                    if (fullName != null) {
+                        findViewById<TextView>(R.id.tvWelcome).text = "Welcome, $fullName"
+                    } else {
+                        // If fullName is not found, use email as fallback
+                        findViewById<TextView>(R.id.tvWelcome).text = "Welcome, ${currentUser.email}"
+                    }
+                }
+                .addOnFailureListener { e ->
+                    // If database read fails, use email as fallback
+                    findViewById<TextView>(R.id.tvWelcome).text = "Welcome, ${currentUser.email}"
+                    Toast.makeText(this, "Could not load user data", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            // If no user is logged in, show generic welcome
+            findViewById<TextView>(R.id.tvWelcome).text = "Welcome"
         }
     }
 
