@@ -249,7 +249,7 @@ class AuthenticationModule : AppCompatActivity() {
                             "Please enter a valid email address."
                         task.exception?.message?.contains("password is too weak") == true ->
                             "Password is too weak. Please use a stronger password."
-                        else -> "Registration failed: ${task.exception?.message}"
+                        else -> "Failed to create account: ${task.exception?.message}"
                     }
                     showToast(errorMessage)
                 }
@@ -257,30 +257,53 @@ class AuthenticationModule : AppCompatActivity() {
     }
     
     private fun handleSuccessfulLogin() {
-        val intent = Intent(this, MainUIActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
+        try {
+            val intent = Intent(this, MainUIActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
+            finish()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error during login transition: ${e.message}", e)
+            showToast("Error during login. Please try again.")
+        }
     }
     
     private fun checkUserAuthentication() {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            handleSuccessfulLogin()
+        try {
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                handleSuccessfulLogin()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking authentication: ${e.message}", e)
         }
     }
     
     private fun validateLoginInput(email: String, password: String): Boolean {
-        if (email.isEmpty() || password.isEmpty()) {
-            showToast("Please fill in all fields")
+        if (email.isEmpty()) {
+            showToast("Please enter your email")
+            return false
+        }
+        if (password.isEmpty()) {
+            showToast("Please enter your password")
             return false
         }
         return true
     }
     
     private fun validateSignupInput(fullName: String, email: String, password: String): Boolean {
-        if (fullName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            showToast("Please fill in all fields")
+        if (fullName.isEmpty()) {
+            showToast("Please enter your full name")
+            return false
+        }
+        if (email.isEmpty()) {
+            showToast("Please enter your email")
+            return false
+        }
+        if (password.isEmpty()) {
+            showToast("Please enter a password")
             return false
         }
         if (password.length < 6) {
@@ -305,15 +328,18 @@ class AuthenticationModule : AppCompatActivity() {
     }
     
     private fun showProgress() {
-        progressDialog.show()
+        if (!progressDialog.isShowing) {
+            progressDialog.show()
+        }
     }
     
     private fun hideProgress() {
-        progressDialog.dismiss()
+        if (progressDialog.isShowing) {
+            progressDialog.dismiss()
+        }
     }
     
     private fun showToast(message: String, duration: Int = SHORT_DURATION) {
         Toast.makeText(this, message, duration).show()
     }
-} 
 } 
