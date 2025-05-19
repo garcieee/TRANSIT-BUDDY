@@ -187,7 +187,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email support@transitbuddy.com or create an issue in the repository.
+For support, email judejosephgarciajr@gmail.com or create an issue in the repository.
 
 ## 🔄 Updates
 
