@@ -9,21 +9,28 @@ import com.google.firebase.database.FirebaseDatabase
  * Main application class for Transit Buddy Sign Up
  */
 class TransitBuddyApplication : Application() {
-    companion object {
-        private const val TAG = "TransitBuddyApp"
-    }
-    
     override fun onCreate() {
         super.onCreate()
-        
-        // Initialize Firebase
-        FirebaseApp.initializeApp(this)
-        // Enable persistence for offline capabilities
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+        try {
+            // Initialize Firebase
+            FirebaseApp.initializeApp(this)
+            
+            // Initialize Firebase Database with the correct URL
+            val database = FirebaseDatabase.getInstance()
+            database.setPersistenceEnabled(true)
+            
+            // Set the database URL explicitly
+            database.getReference(".info/connected").keepSynced(true)
+            
+            Log.d("TransitBuddyApp", "Firebase initialized successfully")
+        } catch (e: Exception) {
+            Log.e("TransitBuddyApp", "Firebase initialization failed: ${e.message}")
+            e.printStackTrace()
+        }
         
         // Set up exception handler
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            Log.e(TAG, "Uncaught exception in thread ${thread.name}", throwable)
+            Log.e("TransitBuddyApp", "Uncaught exception in thread ${thread.name}", throwable)
         }
     }
 } 

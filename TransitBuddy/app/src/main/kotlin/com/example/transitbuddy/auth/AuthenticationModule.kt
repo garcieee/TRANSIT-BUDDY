@@ -17,8 +17,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.transitbuddy_AndroidApp.R
 import com.example.transitbuddy_AndroidApp.ui.MainUIActivity
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -30,40 +32,33 @@ class AuthenticationModule : AppCompatActivity() {
     }
     
     private lateinit var auth: FirebaseAuth
-    private val database = Firebase.database.reference
+    private lateinit var database: FirebaseDatabase
     private lateinit var progressDialog: ProgressDialog
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_landing)
         
-        initFirebase()
-        initProgressDialog()
+        // Initialize Firebase if not already initialized
+        if (!FirebaseApp.getApps(this).any()) {
+            FirebaseApp.initializeApp(this)
+        }
+        
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance()
+        
+        // Initialize progress dialog
+        progressDialog = ProgressDialog(this).apply {
+            setMessage("Please wait...")
+            setCancelable(false)
+        }
+        
+        setContentView(R.layout.activity_landing)
         setupLandingPage()
     }
     
     override fun onStart() {
         super.onStart()
         checkUserAuthentication()
-    }
-    
-    private fun initFirebase() {
-        auth = Firebase.auth
-    }
-    
-    private fun initProgressDialog() {
-        progressDialog = ProgressDialog(this).apply {
-            setMessage("Please wait...")
-            setCancelable(false)
-        }
-    }
-    
-    private fun checkUserAuthentication() {
-        val currentUser = auth.currentUser
-        if (currentUser != null && currentUser.isEmailVerified) {
-            startActivity(Intent(this, MainUIActivity::class.java))
-            finish()
-        }
     }
     
     private fun setupLandingPage() {
@@ -76,37 +71,109 @@ class AuthenticationModule : AppCompatActivity() {
             setContentView(R.layout.activity_signup)
             setupSignupPage()
         }
+
+        // Add Firebase connection test
+        findViewById<Button>(R.id.btn_test_connection).setOnClickListener {
+            testFirebaseConnection()
+        }
+    }
+
+    private fun testFirebaseConnection() {
+        if (!isNetworkAvailable()) {
+            showToast("No internet connection available")
+            return
+        }
+
+        showProgress()
+        try {
+            // Create a temporary test user
+            auth.createUserWithEmailAndPassword("test@test.com", "test123456")
+                .addOnSuccessListener { authResult ->
+                    val user = authResult.user
+                    if (user != null) {
+                        // Try to write to the user's own node
+                        val userRef = database.getReference("users").child(user.uid)
+                        val testData = mapOf(
+                            "email" to "test@test.com",
+                            "fullName" to "Test User",
+                            "createdAt" to System.currentTimeMillis()
+                        )
+                        
+                        userRef.setValue(testData)
+                            .addOnSuccessListener {
+                                // Clean up: delete the test user
+                                user.delete()
+                                    .addOnSuccessListener {
+                                        hideProgress()
+                                        showToast("Firebase connection successful!", LONG_DURATION)
+                                    }
+                                    .addOnFailureListener { e ->
+                                        hideProgress()
+                                        showToast("Firebase connection successful, but cleanup failed: ${e.message}")
+                                        Log.e(TAG, "User cleanup failed", e)
+                                    }
+                            }
+                            .addOnFailureListener { e ->
+                                // Clean up: delete the test user
+                                user.delete()
+                                hideProgress()
+                                showToast("Firebase connection failed: ${e.message}")
+                                Log.e(TAG, "Firebase connection test failed", e)
+                            }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    hideProgress()
+                    showToast("Firebase connection failed: ${e.message}")
+                    Log.e(TAG, "Firebase connection test failed", e)
+                }
+        } catch (e: Exception) {
+            hideProgress()
+            showToast("Firebase connection failed: ${e.message}")
+            Log.e(TAG, "Firebase connection test failed", e)
+        }
     }
     
     private fun setupLoginPage() {
         val emailInput = findViewById<EditText>(R.id.email_input)
         val passwordInput = findViewById<EditText>(R.id.password_input)
+        val loginButton = findViewById<Button>(R.id.login_btn)
+        val signupLink = findViewById<Button>(R.id.signup_redirect_btn)
         
-        findViewById<Button>(R.id.login_btn).setOnClickListener {
-            authenticateUser(emailInput.text.toString().trim(), passwordInput.text.toString())
+        loginButton.setOnClickListener {
+            val email = emailInput.text.toString()
+            val password = passwordInput.text.toString()
+            authenticateUser(email, password)
         }
         
-        findViewById<TextView>(R.id.forgot_password).setOnClickListener {
-            showForgotPasswordDialog()
-        }
-        
-        findViewById<Button>(R.id.signup_redirect_btn).setOnClickListener {
+        signupLink.setOnClickListener {
             setContentView(R.layout.activity_signup)
             setupSignupPage()
         }
     }
     
     private fun setupSignupPage() {
-        findViewById<Button>(R.id.signup_btn).setOnClickListener {
-            val email = findViewById<EditText>(R.id.email_input).text.toString().trim()
-            val fullName = findViewById<EditText>(R.id.name_input).text.toString().trim()
-            val password = findViewById<EditText>(R.id.password_input).text.toString()
-            val confirmPassword = findViewById<EditText>(R.id.confirmpassword_input).text.toString()
+        val fullNameInput = findViewById<EditText>(R.id.name_input)
+        val emailInput = findViewById<EditText>(R.id.email_input)
+        val passwordInput = findViewById<EditText>(R.id.password_input)
+        val confirmPasswordInput = findViewById<EditText>(R.id.confirmpassword_input)
+        val signupButton = findViewById<Button>(R.id.signup_btn)
+        val loginLink = findViewById<Button>(R.id.login_redirect_btn)
+        
+        signupButton.setOnClickListener {
+            val fullName = fullNameInput.text.toString()
+            val email = emailInput.text.toString()
+            val password = passwordInput.text.toString()
+            val confirmPassword = confirmPasswordInput.text.toString()
             
-            createUser(email, fullName, password, confirmPassword)
+            if (password == confirmPassword) {
+                createUser(fullName, email, password)
+            } else {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            }
         }
         
-        findViewById<Button>(R.id.login_redirect_btn).setOnClickListener {
+        loginLink.setOnClickListener {
             setContentView(R.layout.activity_login)
             setupLoginPage()
         }
@@ -159,15 +226,15 @@ class AuthenticationModule : AppCompatActivity() {
         }
     }
     
-    private fun createUser(email: String, fullName: String, password: String, confirmPassword: String) {
-        if (!validateSignupInput(email, fullName, password, confirmPassword)) return
+    private fun createUser(fullName: String, email: String, password: String) {
+        if (!validateSignupInput(email, fullName, password)) return
         
         showProgress()
         
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    saveUserInfoToDatabase(email, fullName)
+                    saveUserInfoToDatabase(fullName, email)
                     sendVerificationEmail()
                 } else {
                     hideProgress()
@@ -176,14 +243,10 @@ class AuthenticationModule : AppCompatActivity() {
             }
     }
     
-    private fun validateSignupInput(email: String, fullName: String, password: String, confirmPassword: String): Boolean {
+    private fun validateSignupInput(email: String, fullName: String, password: String): Boolean {
         when {
-            email.isEmpty() || fullName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
+            email.isEmpty() || fullName.isEmpty() || password.isEmpty() -> {
                 showToast("Please fill all fields")
-                return false
-            }
-            password != confirmPassword -> {
-                showToast("Passwords do not match")
                 return false
             }
             !isNetworkAvailable() -> {
@@ -194,56 +257,69 @@ class AuthenticationModule : AppCompatActivity() {
         }
     }
     
-    private fun saveUserInfoToDatabase(email: String, fullName: String) {
-        val user = auth.currentUser
-        if (user != null) {
-            val userId = user.uid
-            val userInfo = mapOf(
-                "email" to email,
-                "fullName" to fullName,
-                "createdAt" to System.currentTimeMillis()
-            )
-            
-            database.child("users").child(userId).setValue(userInfo)
-                .addOnSuccessListener {
-                    // Data saved successfully
-                }
-                .addOnFailureListener { e ->
-                    Log.e(TAG, "Error saving user data", e)
-                }
+    private fun saveUserInfoToDatabase(fullName: String, email: String) {
+        try {
+            val user = auth.currentUser
+            if (user != null) {
+                val userId = user.uid
+                val userInfo = mapOf(
+                    "email" to email,
+                    "fullName" to fullName,
+                    "createdAt" to System.currentTimeMillis()
+                )
+                
+                database.getReference("users").child(userId).setValue(userInfo)
+                    .addOnSuccessListener {
+                        // Data saved successfully
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Error saving user data", e)
+                    }
+            }
+        } catch (e: Exception) {
+            showToast("Firebase unavailable: ${e.message}")
         }
     }
     
     private fun sendVerificationEmail() {
-        auth.currentUser?.sendEmailVerification()
-            ?.addOnCompleteListener { emailTask ->
-                hideProgress()
-                if (emailTask.isSuccessful) {
-                    showVerificationEmailSentDialog()
-                    clearSignupFields()
-                } else {
-                    showToast("Failed to send verification email: ${emailTask.exception?.message}")
+        try {
+            auth.currentUser?.sendEmailVerification()
+                ?.addOnCompleteListener { emailTask ->
+                    hideProgress()
+                    if (emailTask.isSuccessful) {
+                        showVerificationEmailSentDialog()
+                    } else {
+                        showToast("Failed to send verification email: ${emailTask.exception?.message}")
+                    }
                 }
-            }
+        } catch (e: Exception) {
+            hideProgress()
+            showToast("Firebase unavailable: ${e.message}")
+        }
     }
     
     private fun resendVerificationEmail() {
-        val user = auth.currentUser
-        if (user != null && !isNetworkAvailable()) {
-            showToast("No internet connection available")
-            return
-        }
-        
-        showProgress()
-        user?.sendEmailVerification()
-            ?.addOnCompleteListener { task ->
-                hideProgress()
-                if (task.isSuccessful) {
-                    showToast("Verification email sent")
-                } else {
-                    showToast("Failed to send verification email: ${task.exception?.message}")
-                }
+        try {
+            val user = auth.currentUser
+            if (user != null && !isNetworkAvailable()) {
+                showToast("No internet connection available")
+                return
             }
+            
+            showProgress()
+            user?.sendEmailVerification()
+                ?.addOnCompleteListener { task ->
+                    hideProgress()
+                    if (task.isSuccessful) {
+                        showToast("Verification email sent")
+                    } else {
+                        showToast("Failed to send verification email: ${task.exception?.message}")
+                    }
+                }
+        } catch (e: Exception) {
+            hideProgress()
+            showToast("Firebase unavailable: ${e.message}")
+        }
     }
     
     private fun resetPassword(email: String) {
@@ -253,15 +329,20 @@ class AuthenticationModule : AppCompatActivity() {
         }
         
         showProgress()
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                hideProgress()
-                if (task.isSuccessful) {
-                    showToast("Password reset email sent")
-                } else {
-                    showToast("Failed to send reset email: ${task.exception?.message}")
+        try {
+            auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    hideProgress()
+                    if (task.isSuccessful) {
+                        showToast("Password reset email sent")
+                    } else {
+                        showToast("Failed to send reset email: ${task.exception?.message}")
+                    }
                 }
-            }
+        } catch (e: Exception) {
+            hideProgress()
+            showToast("Firebase unavailable: ${e.message}")
+        }
     }
     
     private fun showEmailVerificationDialog() {
@@ -318,11 +399,16 @@ class AuthenticationModule : AppCompatActivity() {
         }
     }
     
-    private fun clearSignupFields() {
-        findViewById<EditText>(R.id.email_input).text.clear()
-        findViewById<EditText>(R.id.name_input).text.clear()
-        findViewById<EditText>(R.id.password_input).text.clear()
-        findViewById<EditText>(R.id.confirmpassword_input).text.clear()
+    private fun checkUserAuthentication() {
+        try {
+            val currentUser = auth.currentUser
+            if (currentUser != null && currentUser.isEmailVerified) {
+                startActivity(Intent(this, MainUIActivity::class.java))
+                finish()
+            }
+        } catch (e: Exception) {
+            showToast("Firebase unavailable: ${e.message}")
+        }
     }
     
     private fun isNetworkAvailable(): Boolean {
