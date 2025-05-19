@@ -1,4 +1,4 @@
-package com.example.transitbuddy
+package com.example.transitbuddy_AndroidApp
 
 import android.app.AlertDialog
 import android.app.ProgressDialog
