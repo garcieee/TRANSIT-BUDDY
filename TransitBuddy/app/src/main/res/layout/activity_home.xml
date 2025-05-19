@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeActivity">
+    tools:context=".ui.MainUIActivity">
 
     <ImageView
         android:id="@+id/bgImage"
@@ -227,7 +227,7 @@
             android:layout_marginEnd="95dp"
             android:layout_marginTop="16dp" />
 
-        <RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/paymentHistory"
             android:layout_width="match_parent"
             android:layout_height="291dp"
