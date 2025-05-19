@@ -198,226 +198,104 @@ class AuthenticationModule : AppCompatActivity() {
                         task.exception?.message?.contains("credential is incorrect") == true -> 
                             "Invalid email or password. Please try again."
                         task.exception?.message?.contains("RecaptchaCallWrapper") == true ->
-                            "Security verification failed. Please check your internet connection and try again."
+                            "Please try again later. Too many attempts."
                         else -> "Authentication failed: ${task.exception?.message}"
                     }
                     showToast(errorMessage)
-                    Log.e(TAG, "Auth error", task.exception)
                 }
             }
-    }
-    
-    private fun validateLoginInput(email: String, password: String): Boolean {
-        if (email.isEmpty() || password.isEmpty()) {
-            showToast("Please fill all fields")
-            return false
-        }
-        return true
-    }
-    
-    private fun handleSuccessfulLogin() {
-        val user = auth.currentUser
-        if (user != null && user.isEmailVerified) {
-            startActivity(Intent(this, MainUIActivity::class.java))
-            finish()
-        } else {
-            auth.signOut()
-            showEmailVerificationDialog()
-        }
     }
     
     private fun createUser(fullName: String, email: String, password: String) {
-        if (!validateSignupInput(email, fullName, password)) return
-        
-        showProgress()
-        
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    saveUserInfoToDatabase(fullName, email)
-                    sendVerificationEmail()
-                } else {
-                    hideProgress()
-                    showToast("Account creation failed: ${task.exception?.message}")
-                }
-            }
-    }
-    
-    private fun validateSignupInput(email: String, fullName: String, password: String): Boolean {
-        when {
-            email.isEmpty() || fullName.isEmpty() || password.isEmpty() -> {
-                showToast("Please fill all fields")
-                return false
-            }
-            !isNetworkAvailable() -> {
-                showToast("No internet connection available")
-                return false
-            }
-            else -> return true
-        }
-    }
-    
-    private fun saveUserInfoToDatabase(fullName: String, email: String) {
-        try {
-            val user = auth.currentUser
-            if (user != null) {
-                val userId = user.uid
-                val userInfo = mapOf(
-                    "email" to email,
-                    "fullName" to fullName,
-                    "createdAt" to System.currentTimeMillis()
-                )
-                
-                database.getReference("users").child(userId).setValue(userInfo)
-                    .addOnSuccessListener {
-                        // Data saved successfully
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e(TAG, "Error saving user data", e)
-                    }
-            }
-        } catch (e: Exception) {
-            showToast("Firebase unavailable: ${e.message}")
-        }
-    }
-    
-    private fun sendVerificationEmail() {
-        try {
-            auth.currentUser?.sendEmailVerification()
-                ?.addOnCompleteListener { emailTask ->
-                    hideProgress()
-                    if (emailTask.isSuccessful) {
-                        showVerificationEmailSentDialog()
-                    } else {
-                        showToast("Failed to send verification email: ${emailTask.exception?.message}")
-                    }
-                }
-        } catch (e: Exception) {
-            hideProgress()
-            showToast("Firebase unavailable: ${e.message}")
-        }
-    }
-    
-    private fun resendVerificationEmail() {
-        try {
-            val user = auth.currentUser
-            if (user != null && !isNetworkAvailable()) {
-                showToast("No internet connection available")
-                return
-            }
-            
-            showProgress()
-            user?.sendEmailVerification()
-                ?.addOnCompleteListener { task ->
-                    hideProgress()
-                    if (task.isSuccessful) {
-                        showToast("Verification email sent")
-                    } else {
-                        showToast("Failed to send verification email: ${task.exception?.message}")
-                    }
-                }
-        } catch (e: Exception) {
-            hideProgress()
-            showToast("Firebase unavailable: ${e.message}")
-        }
-    }
-    
-    private fun resetPassword(email: String) {
+        if (!validateSignupInput(fullName, email, password)) return
         if (!isNetworkAvailable()) {
             showToast("No internet connection available")
             return
         }
         
         showProgress()
-        try {
-            auth.sendPasswordResetEmail(email)
-                .addOnCompleteListener { task ->
-                    hideProgress()
-                    if (task.isSuccessful) {
-                        showToast("Password reset email sent")
-                    } else {
-                        showToast("Failed to send reset email: ${task.exception?.message}")
-                    }
-                }
-        } catch (e: Exception) {
-            hideProgress()
-            showToast("Firebase unavailable: ${e.message}")
-        }
-    }
-    
-    private fun showEmailVerificationDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Email Verification Required")
-            .setMessage("Please verify your email address by clicking the link in the verification email we sent you.")
-            .setPositiveButton("Resend Email") { _, _ -> resendVerificationEmail() }
-            .setNegativeButton("OK", null)
-            .show()
-    }
-    
-    private fun showVerificationEmailSentDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Verification Email Sent")
-            .setMessage("A verification email has been sent to your email address. Please verify your email to complete registration.")
-            .setPositiveButton("OK") { _, _ -> 
-                setContentView(R.layout.activity_login)
-                setupLoginPage()
-            }
-            .setCancelable(false)
-            .show()
-    }
-    
-    private fun showForgotPasswordDialog() {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_forgot_password, null)
-        val emailInput = dialogView.findViewById<EditText>(R.id.email_input)
         
-        AlertDialog.Builder(this)
-            .setTitle("Forgot Password")
-            .setView(dialogView)
-            .setPositiveButton("Reset Password") { _, _ ->
-                val email = emailInput.text.toString().trim()
-                if (email.isNotEmpty()) {
-                    resetPassword(email)
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = task.result.user
+                    if (user != null) {
+                        // Create user profile in database
+                        val userRef = database.getReference("users").child(user.uid)
+                        val userData = mapOf(
+                            "fullName" to fullName,
+                            "email" to email,
+                            "createdAt" to System.currentTimeMillis()
+                        )
+                        
+                        userRef.setValue(userData)
+                            .addOnSuccessListener {
+                                hideProgress()
+                                handleSuccessfulLogin()
+                            }
+                            .addOnFailureListener { e ->
+                                hideProgress()
+                                showToast("Failed to create user profile: ${e.message}")
+                                // Delete the user since profile creation failed
+                                user.delete()
+                            }
+                    }
                 } else {
-                    showToast("Please enter your email")
+                    hideProgress()
+                    val errorMessage = when {
+                        task.exception?.message?.contains("email address is already in use") == true ->
+                            "This email is already registered. Please login instead."
+                        task.exception?.message?.contains("badly formatted") == true ->
+                            "Please enter a valid email address."
+                        task.exception?.message?.contains("password is too weak") == true ->
+                            "Password is too weak. Please use a stronger password."
+                        else -> "Registration failed: ${task.exception?.message}"
+                    }
+                    showToast(errorMessage)
                 }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
     }
     
-    private fun showToast(message: String, duration: Int = SHORT_DURATION) {
-        Toast.makeText(this, message, duration).show()
-    }
-    
-    private fun showProgress() {
-        progressDialog.show()
-    }
-    
-    private fun hideProgress() {
-        if (progressDialog.isShowing) {
-            progressDialog.dismiss()
-        }
+    private fun handleSuccessfulLogin() {
+        val intent = Intent(this, MainUIActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
     
     private fun checkUserAuthentication() {
-        try {
-            val currentUser = auth.currentUser
-            if (currentUser != null && currentUser.isEmailVerified) {
-                startActivity(Intent(this, MainUIActivity::class.java))
-                finish()
-            }
-        } catch (e: Exception) {
-            showToast("Firebase unavailable: ${e.message}")
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            handleSuccessfulLogin()
         }
+    }
+    
+    private fun validateLoginInput(email: String, password: String): Boolean {
+        if (email.isEmpty() || password.isEmpty()) {
+            showToast("Please fill in all fields")
+            return false
+        }
+        return true
+    }
+    
+    private fun validateSignupInput(fullName: String, email: String, password: String): Boolean {
+        if (fullName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            showToast("Please fill in all fields")
+            return false
+        }
+        if (password.length < 6) {
+            showToast("Password must be at least 6 characters")
+            return false
+        }
+        return true
     }
     
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val network = connectivityManager.activeNetwork ?: return false
-            val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-            return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         } else {
             @Suppress("DEPRECATION")
             val networkInfo = connectivityManager.activeNetworkInfo
@@ -425,4 +303,17 @@ class AuthenticationModule : AppCompatActivity() {
             return networkInfo != null && networkInfo.isConnected
         }
     }
+    
+    private fun showProgress() {
+        progressDialog.show()
+    }
+    
+    private fun hideProgress() {
+        progressDialog.dismiss()
+    }
+    
+    private fun showToast(message: String, duration: Int = SHORT_DURATION) {
+        Toast.makeText(this, message, duration).show()
+    }
+} 
 } 

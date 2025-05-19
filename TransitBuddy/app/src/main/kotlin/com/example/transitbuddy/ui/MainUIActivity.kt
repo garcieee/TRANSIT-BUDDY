@@ -17,7 +17,7 @@ class MainUIActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main_ui)
+        setContentView(R.layout.activity_home)
         
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance()
@@ -39,8 +39,8 @@ class MainUIActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnProfile).setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            // TODO: Create ProfileActivity
+            Toast.makeText(this, "Profile feature coming soon!", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btnLandmarks).setOnClickListener {

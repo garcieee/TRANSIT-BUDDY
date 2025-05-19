@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".HomeActivity">
 
     <ImageView
         android:id="@+id/bgImage"
@@ -143,7 +143,8 @@
                 android:text="Transfer"
                 android:textColor="@android:color/white"
                 android:textSize="15sp"
-                android:backgroundTint="#343341" />
+                android:backgroundTint="#343341"
+                android:onClick="onTransferClick" />
 
             <Button
                 android:id="@+id/receiveButton"
@@ -154,7 +155,8 @@
                 android:text="QR Code"
                 android:textColor="@android:color/white"
                 android:textSize="15sp"
-                android:backgroundTint="#343341" />
+                android:backgroundTint="#343341"
+                android:onClick="onQRCodeClick" />
 
             <Button
                 android:id="@+id/profileButton"
@@ -166,7 +168,8 @@
                 android:text="Profile"
                 android:textColor="@android:color/white"
                 android:textSize="15sp"
-                android:backgroundTint="#343341" />
+                android:backgroundTint="#343341"
+                android:onClick="onProfileClick" />
 
         </LinearLayout>
 
@@ -195,7 +198,8 @@
                 android:text="Landmarks"
                 android:textColor="@android:color/white"
                 android:textSize="15sp"
-                android:backgroundTint="#343341" />
+                android:backgroundTint="#343341"
+                android:onClick="onLandmarksClick" />
 
             <Button
                 android:id="@+id/stationButton"
@@ -207,7 +211,8 @@
                 android:text="Stations"
                 android:textColor="@android:color/white"
                 android:textSize="15sp"
-                android:backgroundTint="#343341" />
+                android:backgroundTint="#343341"
+                android:onClick="onStationsClick" />
 
         </LinearLayout>
 
