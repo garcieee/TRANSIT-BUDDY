@@ -8,6 +8,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
@@ -139,6 +140,41 @@ class AuthenticationModule : AppCompatActivity() {
         val passwordInput = findViewById<EditText>(R.id.password_input)
         val loginButton = findViewById<Button>(R.id.login_btn)
         val signupLink = findViewById<Button>(R.id.signup_redirect_btn)
+        val nameText = findViewById<TextView>(R.id.name_text)
+        
+        // Add text change listener to email input
+        emailInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val email = s.toString()
+                if (email.isNotEmpty()) {
+                    // Check if user exists and get their name
+                    database.getReference("users")
+                        .orderByChild("email")
+                        .equalTo(email)
+                        .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
+                            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    for (userSnapshot in snapshot.children) {
+                                        val fullName = userSnapshot.child("fullName").getValue(String::class.java)
+                                        if (fullName != null) {
+                                            nameText.text = fullName
+                                            return
+                                        }
+                                    }
+                                }
+                                nameText.text = ""
+                            }
+                            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                                nameText.text = ""
+                            }
+                        })
+                } else {
+                    nameText.text = ""
+                }
+            }
+        })
         
         loginButton.setOnClickListener {
             val email = emailInput.text.toString()

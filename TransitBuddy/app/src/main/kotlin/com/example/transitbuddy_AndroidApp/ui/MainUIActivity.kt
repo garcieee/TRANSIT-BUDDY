@@ -31,7 +31,21 @@ class MainUIActivity : AppCompatActivity() {
             // Set up welcome message
             val currentUser = auth.currentUser
             val titleText = findViewById<TextView>(R.id.titleText)
-            titleText.text = "Welcome, ${currentUser?.email?.split("@")?.get(0) ?: "User"}!"
+            
+            // Get user's name from database
+            if (currentUser != null) {
+                database.getReference("users")
+                    .child(currentUser.uid)
+                    .child("fullName")
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        val fullName = snapshot.getValue(String::class.java)
+                        titleText.text = "Welcome, ${fullName ?: "User"}!"
+                    }
+                    .addOnFailureListener {
+                        titleText.text = "Welcome, User!"
+                    }
+            }
             
             // Set up navigation buttons
             findViewById<ImageButton>(R.id.topLeftButton).setOnClickListener {
