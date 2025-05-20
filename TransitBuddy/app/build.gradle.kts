@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.example.transitbuddy_AndroidApp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.transitbuddy_AndroidApp"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 

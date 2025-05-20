@@ -1,51 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/signupbg"
-    android:padding="16dp">
+    tools:context=".ui.MainUIActivity">
+
+    <ImageView
+        android:id="@+id/bgImage"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/bgtop" />
+
+    <ImageButton
+        android:id="@+id/topLeftButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/baseline_dehaze_24"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside" />
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/red_hat_display_bold"
+        android:text="Dashboard"
+        android:textSize="23sp"
+        android:gravity="center"
+        android:textColor="#f8f8f8"
+        android:layout_toEndOf="@id/topLeftButton"
+        android:layout_toStartOf="@id/notification"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_alignTop="@id/topLeftButton"
+        android:layout_alignBottom="@id/topLeftButton" />
+
+    <ImageButton
+        android:id="@+id/notification"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/baseline_notifications_24"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside" />
+
+    <!-- Your Balance label -->
+    <TextView
+        android:id="@+id/yourBalance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/topLeftButton"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/red_hat_display_regualr"
+        android:gravity="center"
+        android:layout_marginLeft="40dp"
+        android:text="Your Balance"
+        android:textColor="#f8f8f8"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/pesoIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/yourBalance"
+        android:layout_marginTop="-6dp"
+        android:layout_marginLeft="40dp"
+        android:gravity="start"
+        android:text="₱"
+        android:textColor="#f8f8f8"
+        android:textSize="40sp" />
+
+    <TextView
+        android:id="@+id/balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/yourBalance"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="-5dp"
+        android:fontFamily="@font/red_hat_display_regualr"
+        android:gravity="start"
+        android:text="00.00"
+        android:textColor="#f8f8f8"
+        android:textSize="40sp" />
+
+    <Button
+        android:id="@+id/actionButton"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/balance"
+        android:layout_alignTop="@id/balance"
+        android:fontFamily="@font/red_hat_display_bold"
+        android:layout_marginStart="56dp"
+        android:padding="11dp"
+        android:layout_marginTop="-9dp"
+        android:text="Load"
+        android:textColor="#343341"
+        android:textSize="19sp"
+        android:backgroundTint="#f8f8f8" />
 
     <LinearLayout
+        android:id="@+id/mainContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/bgImage"
+        android:padding="32dp"
+        android:background="#f8f8f8"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:gravity="center">
 
         <TextView
-            android:id="@+id/txt_welcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Wallet"
+            android:fontFamily="@font/red_hat_display_bold"
+            android:textColor="#343341"
+            android:textSize="18sp"
+            android:layout_marginEnd="120dp" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Welcome"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/transferButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="@font/red_hat_display_regualr"
+                android:text="Transfer"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:backgroundTint="#343341"
+                android:onClick="onTransferClick" />
+
+            <Button
+                android:id="@+id/receiveButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/red_hat_display_regualr"
+                android:text="QR Code"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:backgroundTint="#343341"
+                android:onClick="onQRCodeClick" />
+
+            <Button
+                android:id="@+id/profileButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/red_hat_display_regualr"
+                android:text="Profile"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:backgroundTint="#343341"
+                android:onClick="onProfileClick" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Navigation"
             android:fontFamily="@font/red_hat_display_bold"
+            android:textColor="#343341"
+            android:textSize="18sp"
+            android:layout_marginEnd="120dp"
             android:layout_marginTop="16dp" />
 
-        <View
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#FFFFFF"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/landmarksButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/red_hat_display_regualr"
+                android:text="Landmarks"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:backgroundTint="#343341"
+                android:onClick="onLandmarksClick" />
+
+            <Button
+                android:id="@+id/stationButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/red_hat_display_regualr"
+                android:text="Stations"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:backgroundTint="#343341"
+                android:onClick="onStationsClick" />
+
+        </LinearLayout>
+
+        <!-- Payment History Section -->
         <TextView
-            android:id="@+id/txt_user_details"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User Details"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:fontFamily="@font/red_hat_display_regualr"
-            android:layout_marginTop="8dp" />
-
-        <Button
-            android:id="@+id/btn_sign_out"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sign Out"
+            android:text="Payment History"
+            android:fontFamily="@font/red_hat_display_bold"
             android:textColor="#343341"
-            android:backgroundTint="@color/white"
-            android:layout_marginTop="24dp"
-            android:padding="12dp" />
+            android:textSize="18sp"
+            android:layout_marginEnd="95dp"
+            android:layout_marginTop="16dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/paymentHistory"
+            android:layout_width="match_parent"
+            android:layout_height="291dp"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="true" />
+
     </LinearLayout>
-</RelativeLayout> 
+
+</RelativeLayout>
