@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:id="@+id/bgImage"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/bgtop" />
+
+    <ImageButton
+        android:id="@+id/topLeftButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contextClickable="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/baseline_dehaze_24"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside"
+        app:tint="@android:color/white" />
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/red_hat_display_bold"
+        android:text="User Profile"
+        android:textSize="23sp"
+        android:gravity="center"
+        android:textColor="#f8f8f8"
+        android:layout_toEndOf="@id/topLeftButton"
+        android:layout_toStartOf="@id/notification"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_alignTop="@id/topLeftButton"
+        android:layout_alignBottom="@id/topLeftButton" />
+
+    <ImageButton
+        android:id="@+id/notification"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:contextClickable="true"
+        android:src="@drawable/baseline_notifications_24"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside" />
+
+    <ImageView
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_below="@id/topLeftButton"
+        android:src="@drawable/user_icon"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="30dp" />
+
+    <TextView
+        android:id="@+id/account_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titleText"
+        android:text="Account Name"
+        android:fontFamily="@font/red_hat_display_regualr"
+        android:textColor="#f8f8f8"
+        android:textSize="27sp"
+        android:layout_marginStart="135dp"
+        android:layout_marginTop="35dp" />
+
+    <TextView
+        android:id="@+id/account_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titleText"
+        android:text="Account number"
+        android:fontFamily="@font/red_hat_display_regualr"
+        android:textColor="#f8f8f8"
+        android:textSize="18sp"
+        android:layout_marginStart="135dp"
+        android:layout_marginTop="70dp" />
+
+    <!-- Add a LinearLayout to stack the buttons vertically -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/account_number"
+        android:layout_marginTop="48dp"
+        android:orientation="vertical">
+
+        <!-- Settings Button -->
+        <LinearLayout
+            android:id="@+id/settings_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:padding="25dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <!-- Settings Icon -->
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/gear_icon"
+                app:tint="#000000" />
+
+            <!-- Settings Text -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:text="Settings"
+                android:fontFamily="@font/red_hat_display_bold"
+                android:textSize="20sp"
+                android:textColor="#343341" />
+
+            <!-- Chevron Icon -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/baseline_chevron_right_24"
+                app:tint="#343341" />
+        </LinearLayout>
+
+        <!-- Terms and Conditions Button -->
+        <LinearLayout
+            android:id="@+id/terms_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="25dp">
+
+            <!-- Terms Icon -->
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/tnc_icon"
+                app:tint="#000000" />
+
+            <!-- Terms Text -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/red_hat_display_bold"
+                android:text="Terms and Conditions"
+                android:textColor="#343341"
+                android:textSize="20sp" />
+
+            <!-- Chevron Icon -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/baseline_chevron_right_24"
+                app:tint="#343341" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_navigation_menu"
+        app:itemIconTint="@android:color/white"
+        app:itemTextColor="@android:color/white"
+        android:background="#343341"
+        app:labelVisibilityMode="unlabeled" />
+
+
+
+
+</RelativeLayout>
