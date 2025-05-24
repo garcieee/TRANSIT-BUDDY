@@ -89,7 +89,7 @@
             <Button
                 android:id="@+id/btnGenerate"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="45dp"
                 android:layout_weight="1"
                 android:layout_marginStart="6dp"
                 android:background="@drawable/button_outline"
@@ -102,8 +102,8 @@
         <!-- QR Code Placeholder -->
         <ImageView
             android:id="@+id/qrPreview"
-            android:layout_width="273dp"
-            android:layout_height="wrap_content"
+            android:layout_width="309dp"
+            android:layout_height="257dp"
             android:layout_marginBottom="16dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_qr_placeholder_alt" />
@@ -166,30 +166,43 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:background="@drawable/signupbg"
-        android:paddingTop="8dp">
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/nav_home"
             android:layout_width="0dp"
-            android:layout_height="46dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:src="@drawable/ic_home"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Home"
-            android:src="@drawable/ic_home" />
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            app:tint="@android:color/white" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/nav_qr"
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:contentDescription="QR"
-            android:src="@drawable/ic_qr_code" />
+            android:src="@drawable/ic_qr_code"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="QR Code"
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            app:tint="@android:color/white" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/nav_profile"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:src="@drawable/ic_profile"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Profile"
-            android:src="@drawable/ic_profile" />
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            app:tint="@android:color/white" />
     </LinearLayout>
 </RelativeLayout>
