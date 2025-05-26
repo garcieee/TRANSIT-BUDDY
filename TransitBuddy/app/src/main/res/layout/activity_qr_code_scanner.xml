@@ -30,7 +30,7 @@
         android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="QR CODE"
+        android:text="QR Code"
         android:textColor="@android:color/white"
         android:textSize="26sp"
         android:fontFamily="@font/red_hat_display_bold"
