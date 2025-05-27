@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/bgImage"
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="center"
+        android:src="@drawable/bgtop" />
+
+    <ImageButton
+        android:id="@+id/back"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_margin="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contextClickable="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/baseline_chevron_left_24"
+        app:tint="@android:color/white" />
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/red_hat_display_bold"
+        android:text="Load"
+        android:textSize="23sp"
+        android:gravity="center"
+        android:textColor="#f8f8f8"
+        android:layout_toEndOf="@id/back"
+        android:layout_marginStart="105dp"
+        android:layout_marginEnd="100dp"
+        android:layout_alignTop="@id/back"
+        android:layout_alignBottom="@id/back" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titleText"
+        android:layout_marginTop="11dp"
+        android:orientation="vertical"
+        >
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_marginTop="40dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:src="@drawable/gcash"
+        />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Enter Amount"
+            android:layout_gravity="center"
+            android:fontFamily="@font/red_hat_display_bold"
+            android:textColor="#343341"
+            android:textSize="18dp"
+            android:layout_marginTop="10dp"
+            />
+
+        <EditText
+            android:id="@+id/load_amount"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/red_hat_display_bold"
+            android:text="₱ 0.00"
+            android:inputType="numberDecimal"
+            android:textSize="30dp"
+            android:padding="20dp"
+            android:gravity="center"
+            />
+
+        <Button
+            android:id="@+id/sendButton"
+            android:layout_width="350dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:fontFamily="@font/red_hat_display_regualr"
+            android:text="Load"
+            android:textColor="#f8f8f8"
+            android:layout_marginTop="25dp"
+            android:textSize="20sp"
+
+            android:backgroundTint="#343341" />
+
+
+
+    </LinearLayout>
+
+</RelativeLayout>
