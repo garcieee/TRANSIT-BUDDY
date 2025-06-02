@@ -11,6 +11,11 @@ import com.example.transitbuddy_AndroidApp.R
 import com.example.transitbuddy_AndroidApp.auth.AuthenticationModule
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.example.transitbuddy_AndroidApp.ui.UserSettingsActivity
+import com.example.transitbuddy_AndroidApp.ui.CashInMainMenuActivity
+import com.example.transitbuddy_AndroidApp.ui.QRCodeGeneratorActivity
+import com.example.transitbuddy_AndroidApp.ui.ProfileActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainUIActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -20,10 +25,13 @@ class MainUIActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         
+        supportActionBar?.hide()
+        
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance()
         
         setupUI()
+        setupBottomNavigation()
     }
     
     private fun setupUI() {
@@ -40,23 +48,59 @@ class MainUIActivity : AppCompatActivity() {
                     .get()
                     .addOnSuccessListener { snapshot ->
                         val fullName = snapshot.getValue(String::class.java)
-                        titleText.text = "Welcome, ${fullName ?: "User"}!"
+                        titleText.text = "Dashboard"
                     }
                     .addOnFailureListener {
-                        titleText.text = "Welcome, User!"
+                        titleText.text = "Dashboard"
                     }
+            } else {
+                titleText.text = "Dashboard"
             }
             
             // Set up navigation buttons
             findViewById<ImageButton>(R.id.topLeftButton).setOnClickListener {
-                auth.signOut()
-                val intent = Intent(this, AuthenticationModule::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                val intent = Intent(this, UserSettingsActivity::class.java)
                 startActivity(intent)
-                finish()
+            }
+
+            // Set up notification button
+            findViewById<ImageButton>(R.id.notification).setOnClickListener {
+                Toast.makeText(this, "Notifications coming soon!", Toast.LENGTH_SHORT).show()
+            }
+
+            // Set up Load button
+            findViewById<Button>(R.id.actionButton).setOnClickListener {
+                val intent = Intent(this, CashInMainMenuActivity::class.java)
+                startActivity(intent)
             }
         } catch (e: Exception) {
             Toast.makeText(this, "Error setting up UI: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+    
+    private fun setupBottomNavigation() {
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNavigationView.setOnNavigationItemSelectedListener {
+            when(it.itemId) {
+                R.id.navigation_home -> {
+                    // Already on the home page
+                    true
+                }
+                R.id.navigation_profile -> {
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_location -> {
+                    // Assuming navigation_location goes to a new activity
+                    // Replace NewLocationActivity::class.java with the actual Activity class
+                    // val intent = Intent(this, NewLocationActivity::class.java)
+                    // startActivity(intent)
+                     Toast.makeText(this, "Location feature coming soon!", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> false
+            }
         }
     }
     
@@ -67,12 +111,13 @@ class MainUIActivity : AppCompatActivity() {
     }
     
     fun onQRCodeClick(view: android.view.View) {
-        val intent = Intent(this, QRCodeScannerActivity::class.java)
+        val intent = Intent(this, QRCodeGeneratorActivity::class.java)
         startActivity(intent)
     }
     
     fun onProfileClick(view: android.view.View) {
-        Toast.makeText(this, "Profile feature coming soon!", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, ProfileActivity::class.java)
+        startActivity(intent)
     }
     
     fun onLandmarksClick(view: android.view.View) {

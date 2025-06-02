@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/bgImage"
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:scaleType="center"
+        android:src="@drawable/bgtop" />
+
+    <ImageButton
+        android:id="@+id/back"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_margin="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/baseline_chevron_left_24"
+        app:tint="@android:color/white" />
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/red_hat_display_bold"
+        android:text="Cash-In"
+        android:textSize="30dp"
+        android:gravity="center"
+        android:textColor="#f8f8f8"
+        android:layout_toEndOf="@id/back"
+        android:layout_marginStart="75dp"
+        android:layout_marginEnd="100dp"
+        android:layout_alignTop="@id/back"
+        android:layout_alignBottom="@id/back" />
+
+    <ImageButton
+        android:id="@+id/information"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_margin="10dp"
+        android:layout_alignParentEnd="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/outline_info_24"
+        app:tint="@android:color/white"/>
+
+    <!-- "All cash-in methods" label -->
+
+    <TextView
+        android:id="@+id/all_methods_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titleText"
+        android:layout_marginTop="36dp"
+        android:layout_marginStart="24dp"
+        android:text="All cash-in methods"
+        android:fontFamily="@font/red_hat_display_bold"
+        android:textColor="#343341"
+        android:textSize="24dp" />
+
+    <!-- Section for cash-in options -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/all_methods_label"
+        android:layout_marginTop="24dp"
+        android:orientation="vertical">
+
+        <!-- E-wallet with InstaPay -->
+        <LinearLayout
+            android:id="@+id/ewallet_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingVertical="24dp"
+            android:paddingHorizontal="28dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/outline_wallet_24"
+                app:tint="#000000" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:text="E-wallet with InstaPay"
+                android:fontFamily="@font/red_hat_display_bold"
+                android:textSize="20sp"
+                android:textColor="#343341" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:src="@drawable/baseline_chevron_right_24"
+                app:tint="#343341" />
+        </LinearLayout>
+
+        <!-- Online Banking with InstaPay -->
+        <LinearLayout
+            android:id="@+id/online_banking_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingVertical="24dp"
+            android:paddingHorizontal="28dp">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/outline_bank_24"
+                app:tint="#000000" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/red_hat_display_bold"
+                android:text="Online Banking with InstaPay"
+                android:textColor="#343341"
+                android:textSize="20sp" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/baseline_chevron_right_24"
+                app:tint="#343341" />
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

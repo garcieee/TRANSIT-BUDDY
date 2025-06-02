@@ -38,6 +38,22 @@
         <activity
             android:name=".ui.QRCodeScannerActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.UserSettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.CashInMainMenuActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.QRCodeGeneratorActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.ProfileActivity"
+            android:exported="false" />
             
     </application>
 
