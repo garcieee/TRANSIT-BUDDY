@@ -35,7 +35,7 @@
         android:layout_marginTop="22dp"
         android:text="QR Code"
         android:textColor="@android:color/white"
-        android:textSize="26sp"
+        android:textSize="23sp"
         android:fontFamily="@font/red_hat_display_bold" />
 
     <!-- Notification Icon -->
@@ -161,7 +161,7 @@
     <LinearLayout
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="64dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:gravity="center"

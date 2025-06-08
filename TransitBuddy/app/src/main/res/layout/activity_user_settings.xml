@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:text="User Settings"
         android:textColor="@android:color/white"
-        android:textSize="26sp"
+        android:textSize="23sp"
         android:fontFamily="@font/red_hat_display_bold"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="22dp" />
@@ -95,11 +95,12 @@
                     android:fontFamily="@font/red_hat_display_bold"
                     android:textSize="16sp" />
 
-                <ImageView
+                <ImageButton
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/outline_keyboard_arrow_down_24"
-                    app:tint="#343341" />
+                    app:tint="#343341"
+                    android:background="@android:color/transparent"/>
             </LinearLayout>
 
             <!-- Notifications Toggle -->
@@ -271,6 +272,7 @@
                     app:tint="#343341" />
             </LinearLayout>
 
+            <!-- Logout Button -->
             <!-- Help / FAQ -->
             <LinearLayout
                 android:id="@+id/help_button"
@@ -300,39 +302,39 @@
                     app:tint="#343341" />
             </LinearLayout>
 
+            <!-- Logout Button -->
+            <LinearLayout
+                android:id="@+id/logout_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:layout_marginTop="32dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Logout"
+                    android:textColor="#FF0000"
+                    android:fontFamily="@font/red_hat_display_bold"
+                    android:textSize="20sp" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/baseline_logout_24"
+                    app:tint="#FF0000" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
-    <!-- Logout Button -->
-    <LinearLayout
-        android:id="@+id/logout_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="25dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_above="@id/footerContainer">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"
-            android:text="Logout"
-            android:fontFamily="@font/red_hat_display_bold"
-            android:textSize="20sp"
-            android:textColor="#FF0000" />
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/baseline_logout_24"
-            app:tint="#FF0000" />
-    </LinearLayout>
-
+    <!-- Footer Section -->
     <LinearLayout
         android:id="@+id/footerContainer"
         android:layout_width="match_parent"

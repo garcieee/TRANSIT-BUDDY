@@ -26,14 +26,10 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/red_hat_display_bold"
         android:text="Cash-In"
-        android:textSize="30dp"
-        android:gravity="center"
+        android:textSize="23sp"
+        android:layout_centerHorizontal="true"
         android:textColor="#f8f8f8"
-        android:layout_toEndOf="@id/back"
-        android:layout_marginStart="75dp"
-        android:layout_marginEnd="100dp"
-        android:layout_alignTop="@id/back"
-        android:layout_alignBottom="@id/back" />
+        android:layout_marginTop="22dp" />
 
     <ImageButton
         android:id="@+id/information"
@@ -54,7 +50,7 @@
         android:layout_below="@id/titleText"
         android:layout_marginTop="36dp"
         android:layout_marginStart="24dp"
-        android:text="All cash-in methods"
+        android:text="All Cash-In methods"
         android:fontFamily="@font/red_hat_display_bold"
         android:textColor="#343341"
         android:textSize="24dp" />
