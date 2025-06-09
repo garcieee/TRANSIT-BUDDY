@@ -11,11 +11,16 @@ import com.example.transitbuddy_AndroidApp.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
+import android.widget.ImageButton
 
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +30,53 @@ class ProfileActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance()
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.navigation_view)
+
+        findViewById<ImageButton>(R.id.topLeftButton).setOnClickListener {
+            drawerLayout.openDrawer(navigationView)
+        }
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            drawerLayout.closeDrawers()
+            when (menuItem.itemId) {
+                R.id.nav_dashboard -> {
+                    val intent = Intent(this, MainUIActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.nav_profile -> {
+                    // Already on profile
+                    true
+                }
+                R.id.nav_transfer -> {
+                    val intent = Intent(this, ExpressSendActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.nav_stations -> {
+                    val intent = Intent(this, StationsMapActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.nav_landmarks -> {
+                    Toast.makeText(this, "Station Landmarks coming soon!", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.nav_settings -> {
+                    val intent = Intent(this, UserSettingsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.nav_logout -> {
+                    // TODO: Implement logout logic
+                    Toast.makeText(this, "Logged out!", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> false
+            }
+        }
 
         setupUI()
         setupBottomNavigation()

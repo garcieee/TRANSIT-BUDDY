@@ -1,140 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Top Background and Controls -->
-    <ImageView
-        android:id="@+id/bgImage"
+    <RelativeLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bgtop"
-        android:contentDescription="@string/bg_image_desc" />
+        android:layout_height="match_parent">
 
-    <ImageButton
-        android:id="@+id/topLeftButton"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_alignTop="@id/bgImage"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/baseline_dehaze_24"
-        app:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/nav_drawer" />
+        <!-- Top Background and Controls -->
+        <ImageView
+            android:id="@+id/bgImage"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bgtop"
+            android:contentDescription="@string/bg_image_desc" />
 
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/qr_code_title"
-        android:textColor="@android:color/white"
-        android:textSize="23sp"
-        android:fontFamily="@font/red_hat_display_bold"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="22dp" />
+        <ImageButton
+            android:id="@+id/topLeftButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_alignTop="@id/bgImage"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/baseline_dehaze_24"
+            app:tint="@android:color/white"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/nav_drawer" />
 
-    <ImageButton
-        android:id="@+id/notification"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_alignTop="@id/bgImage"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/baseline_notifications_24"
-        app:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/notifications" />
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/qr_code_title"
+            android:textColor="@android:color/white"
+            android:textSize="23sp"
+            android:fontFamily="@font/red_hat_display_bold"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="22dp" />
 
-    <!-- 🔵 Main Content Container -->
-    <LinearLayout
-        android:id="@+id/mainContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/bgImage"
-        android:layout_above="@id/bottomNav"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:paddingTop="24dp"
-        android:paddingBottom="16dp">
+        <ImageButton
+            android:id="@+id/notification"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_alignTop="@id/bgImage"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/baseline_notifications_24"
+            app:tint="@android:color/white"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/notifications" />
 
-        <!-- ⚪ Toggle Buttons -->
+        <!-- Main Content Container -->
         <LinearLayout
-            android:id="@+id/toggleButtons"
+            android:id="@+id/mainContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="24dp"
-            android:layout_marginTop="8dp">
+            android:layout_below="@id/bgImage"
+            android:layout_above="@id/bottom_navigation"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp">
 
-            <Button
-                android:id="@+id/btnScan"
-                android:layout_width="0dp"
-                android:layout_height="45dp"
-                android:layout_weight="1"
-                android:text="SCAN"
-                android:fontFamily="@font/red_hat_display_bold"
-                android:textColor="#343341"
-                android:background="@drawable/button_outline"
-                android:layout_marginEnd="8dp"
-                android:paddingVertical="6dp"
-                android:textSize="18sp"
-                android:gravity="center" />
+            <!-- Toggle Buttons -->
+            <LinearLayout
+                android:id="@+id/toggleButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="24dp"
+                android:layout_marginTop="8dp">
 
+                <Button
+                    android:id="@+id/btnScan"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:text="SCAN"
+                    android:fontFamily="@font/red_hat_display_bold"
+                    android:textColor="#343341"
+                    android:background="@drawable/button_outline"
+                    android:layout_marginEnd="8dp"
+                    android:paddingVertical="6dp"
+                    android:textSize="18sp"
+                    android:gravity="center" />
+
+                <Button
+                    android:id="@+id/btnGenerate"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="GENERATE"
+                    android:fontFamily="@font/red_hat_display_bold"
+                    android:textColor="@color/white"
+                    android:backgroundTint="#343341"
+                    android:layout_marginStart="8dp"
+                    android:paddingVertical="12dp"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- QR Code Image -->
+            <ImageView
+                android:id="@+id/qrPlaceholder"
+                android:layout_width="343dp"
+                android:layout_height="318dp"
+                android:layout_marginBottom="24dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_qr_placeholder_alt" />
+
+            <!-- SCAN Button -->
             <Button
-                android:id="@+id/btnGenerate"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:text="GENERATE"
-                android:fontFamily="@font/red_hat_display_bold"
-                android:textColor="@color/white"
+                android:id="@+id/scanButton"
+                android:layout_width="300dp"
+                android:layout_height="69dp"
                 android:backgroundTint="#343341"
-                android:layout_marginStart="8dp"
-                android:paddingVertical="12dp"
-                android:textSize="16sp" />
+                android:fontFamily="@font/red_hat_display_bold"
+                android:paddingVertical="14dp"
+                android:text="SCAN CODE"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
         </LinearLayout>
 
-        <!-- ⚪ QR Code Image -->
-        <ImageView
-            android:id="@+id/qrPlaceholder"
-            android:layout_width="343dp"
-            android:layout_height="318dp"
-            android:layout_marginBottom="24dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_qr_placeholder_alt" />
+        <!-- Bottom Navigation Bar -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            app:menu="@menu/bottom_navigation_menu"
+            app:itemIconTint="@android:color/white"
+            app:itemTextColor="@android:color/white"
+            android:background="#343341"
+            app:labelVisibilityMode="unlabeled" />
+    </RelativeLayout>
 
-        <!-- ⚪ SCAN Button -->
-        <Button
-            android:id="@+id/scanButton"
-            android:layout_width="300dp"
-            android:layout_height="69dp"
-            android:backgroundTint="#343341"
-            android:fontFamily="@font/red_hat_display_bold"
-            android:paddingVertical="14dp"
-            android:text="SCAN CODE"
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
-    </LinearLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/drawer_menu"
+        app:headerLayout="@layout/nav_header" />
 
-    <!-- 🔵 Bottom Navigation Bar -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_navigation_menu"
-        app:itemIconTint="@android:color/white"
-        app:itemTextColor="@android:color/white"
-        android:background="#343341"
-        app:labelVisibilityMode="unlabeled" />
-</RelativeLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

@@ -3,10 +3,9 @@ package com.example.transitbuddy_AndroidApp.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.transitbuddy_AndroidApp.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class QRCodeGeneratorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,18 +23,26 @@ class QRCodeGeneratorActivity : AppCompatActivity() {
         }
 
         // Set up bottom navigation
-        findViewById<ImageView>(R.id.nav_home).setOnClickListener {
-            val intent = Intent(this, MainUIActivity::class.java)
-            startActivity(intent)
-        }
-        
-        findViewById<ImageView>(R.id.nav_qr).setOnClickListener {
-            // Already on QR page
-        }
-        
-        findViewById<ImageView>(R.id.nav_profile).setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.navigation_home -> {
+                    val intent = Intent(this, MainUIActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_profile -> {
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.navigation_location -> {
+                    val intent = Intent(this, StationsMapActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                else -> false
+            }
         }
     }
 } 

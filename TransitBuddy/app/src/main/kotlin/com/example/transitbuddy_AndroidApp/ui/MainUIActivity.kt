@@ -16,6 +16,8 @@ import com.example.transitbuddy_AndroidApp.ui.CashInMainMenuActivity
 import com.example.transitbuddy_AndroidApp.ui.QRCodeGeneratorActivity
 import com.example.transitbuddy_AndroidApp.ui.ProfileActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 
 class MainUIActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth

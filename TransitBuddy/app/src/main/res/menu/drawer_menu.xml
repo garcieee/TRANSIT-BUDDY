@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/ic_home"
+            android:title="Dashboard" />
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/baseline_person_24"
+            android:title="Profile" />
+        <item
+            android:id="@+id/nav_transfer"
+            android:icon="@drawable/ic_transfer"
+            android:title="Transfer Funds" />
+    </group>
+    <item android:title="Navigation">
+        <menu>
+            <item
+                android:id="@+id/nav_stations"
+                android:icon="@drawable/ic_station"
+                android:title="Stations" />
+            <item
+                android:id="@+id/nav_landmarks"
+                android:icon="@drawable/ic_landmark"
+                android:title="Station Landmarks" />
+        </menu>
+    </item>
+    <item android:title="Others">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="Settings" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_logout"
+                android:title="Logout" />
+        </menu>
+    </item>
+</menu> 
