@@ -48,7 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/titleText"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="80dp"
         android:layout_marginStart="24dp"
         android:text="All Cash-In methods"
         android:fontFamily="@font/red_hat_display_bold"
