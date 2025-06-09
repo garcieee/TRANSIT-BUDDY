@@ -92,11 +92,8 @@ class MainUIActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_location -> {
-                    // Assuming navigation_location goes to a new activity
-                    // Replace NewLocationActivity::class.java with the actual Activity class
-                    // val intent = Intent(this, NewLocationActivity::class.java)
-                    // startActivity(intent)
-                     Toast.makeText(this, "Location feature coming soon!", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, StationsMapActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 else -> false
@@ -112,6 +109,11 @@ class MainUIActivity : AppCompatActivity() {
     
     fun onQRCodeClick(view: android.view.View) {
         val intent = Intent(this, QRCodeGeneratorActivity::class.java)
+        startActivity(intent)
+    }
+    
+    fun onLoadClick(view: android.view.View) {
+        val intent = Intent(this, CashInMainMenuActivity::class.java)
         startActivity(intent)
     }
     

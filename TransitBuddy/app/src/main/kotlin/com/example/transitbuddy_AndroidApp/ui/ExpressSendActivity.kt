@@ -18,7 +18,7 @@ class ExpressSendActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_qr_code_generator)
+        setContentView(R.layout.express_send)
         
         supportActionBar?.hide()
         
@@ -28,29 +28,18 @@ class ExpressSendActivity : AppCompatActivity() {
     }
     
     private fun setupUI() {
-        // Set up navigation buttons
+        // Set up back button
         findViewById<ImageButton>(R.id.topLeftButton).setOnClickListener {
-            val intent = Intent(this, UserSettingsActivity::class.java)
-            startActivity(intent)
+            onBackPressed()
         }
         
-        // Set up toggle buttons
-        findViewById<Button>(R.id.btnScan).setOnClickListener {
-            // TODO: Switch to scan mode
-            Toast.makeText(this, "Switching to scan mode...", Toast.LENGTH_SHORT).show()
-        }
-        
-        findViewById<Button>(R.id.btnGenerate).setOnClickListener {
-            // Already in generate mode
+        // Set up send button
+        findViewById<Button>(R.id.sendButton).setOnClickListener {
+            Toast.makeText(this, "Send feature coming soon!", Toast.LENGTH_SHORT).show()
         }
         
         // Set up user info
         val currentUser = auth.currentUser
-        findViewById<TextView>(R.id.textUsername).text = "Username: ${currentUser?.email?.split("@")?.get(0) ?: "User"}"
-        
-        val textAccountNumber = findViewById<TextView>(R.id.textAccountNumber)
-        textAccountNumber.text = "Name: Loading..."
-        
         if (currentUser != null) {
             database.getReference("users")
                 .child(currentUser.uid)
@@ -58,37 +47,11 @@ class ExpressSendActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { snapshot ->
                     val fullName = snapshot.getValue(String::class.java)
-                    textAccountNumber.text = "Name: ${fullName ?: "User"}"
+                    findViewById<TextView>(R.id.balance).text = "0.00" // TODO: Get actual balance
                 }
                 .addOnFailureListener {
-                    textAccountNumber.text = "Name: User"
+                    findViewById<TextView>(R.id.balance).text = "0.00"
                 }
-        } else {
-            textAccountNumber.text = "Name: User"
         }
-        
-        findViewById<TextView>(R.id.textUserID).text = "User ID: ${currentUser?.uid?.take(6) ?: "N/A"}"
-        
-        // Set up bottom navigation
-        findViewById<ImageView>(R.id.nav_home).setOnClickListener {
-            val intent = Intent(this, MainUIActivity::class.java)
-            startActivity(intent)
-        }
-        
-        findViewById<ImageView>(R.id.nav_qr).setOnClickListener {
-            // Already on QR page, no action needed or can restart for simplicity if desired
-            // val intent = Intent(this, QRCodeGeneratorActivity::class.java)
-            // startActivity(intent)
-        }
-        
-        findViewById<ImageView>(R.id.nav_profile).setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Assuming there's a location ImageView with ID nav_location
-        // findViewById<ImageView>(R.id.nav_location).setOnClickListener {
-        //     Toast.makeText(this, "Location feature coming soon!", Toast.LENGTH_SHORT).show()
-        // }
     }
 } 

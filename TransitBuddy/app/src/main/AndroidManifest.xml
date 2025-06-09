@@ -54,6 +54,10 @@
         <activity
             android:name=".ui.ProfileActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.StationsMapActivity"
+            android:exported="false" />
             
     </application>
 

@@ -1,5 +1,6 @@
 package com.example.transitbuddy_AndroidApp.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
@@ -30,7 +31,8 @@ class QRCodeScannerActivity : AppCompatActivity() {
         
         // Set up bottom navigation
         findViewById<ImageView>(R.id.nav_home).setOnClickListener {
-            // TODO: Navigate to home
+            val intent = Intent(this, MainUIActivity::class.java)
+            startActivity(intent)
         }
         
         findViewById<ImageView>(R.id.nav_qr).setOnClickListener {
@@ -38,7 +40,8 @@ class QRCodeScannerActivity : AppCompatActivity() {
         }
         
         findViewById<ImageView>(R.id.nav_profile).setOnClickListener {
-            // TODO: Navigate to profile
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
         }
     }
 } 

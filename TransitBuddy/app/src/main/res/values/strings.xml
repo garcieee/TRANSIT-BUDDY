@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">TransitBuddySignUp</string>
+    <string name="bg_image_desc">Background image</string>
+    <string name="nav_drawer">Open navigation drawer</string>
+    <string name="qr_code_title">QR Code</string>
+    <string name="notifications">Notifications</string>
+    <string name="scan">SCAN</string>
+    <string name="generate">GENERATE</string>
+    <string name="qr_code_image">QR code preview</string>
+    <string name="profile_icon">Profile icon</string>
+    <string name="username_sample">Username: johndoe123</string>
+    <string name="account_number_sample">Account Number: 1234567890</string>
+    <string name="user_id_sample">User ID: U001235</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_qr">QR Code</string>
+    <string name="nav_profile">Profile</string>
+    <string name="dashboard_title">Dashboard</string>
+    <string name="user_settings_title">User Settings</string>
+    <string name="cash_in_title">Cash-In</string>
+    <string name="information">Information</string>
+    <string name="user_profile_title">User Profile</string>
+    <string name="stations_map_title">Stations Map</string>
 </resources>

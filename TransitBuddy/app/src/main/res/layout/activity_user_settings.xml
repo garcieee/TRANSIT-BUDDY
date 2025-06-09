@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/bgtop" />
+        android:src="@drawable/bgtop"
+        android:contentDescription="@string/bg_image_desc" />
 
     <ImageButton
         android:id="@+id/topLeftButton"
@@ -22,13 +23,14 @@
         android:layout_alignParentStart="true"
         android:src="@drawable/baseline_dehaze_24"
         app:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/nav_drawer" />
 
     <TextView
         android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="User Settings"
+        android:text="@string/user_settings_title"
         android:textColor="@android:color/white"
         android:textSize="23sp"
         android:fontFamily="@font/red_hat_display_bold"
@@ -45,7 +47,8 @@
         android:layout_alignParentEnd="true"
         android:src="@drawable/baseline_notifications_24"
         app:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/notifications" />
 
 
     <!-- Scrollable Content -->
