@@ -21,11 +21,13 @@ class StationsMapActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     val intent = Intent(this, MainUIActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 R.id.navigation_profile -> {
                     val intent = Intent(this, ProfileActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 R.id.navigation_location -> {

@@ -74,6 +74,7 @@ class MainUIActivity : AppCompatActivity() {
             findViewById<Button>(R.id.actionButton).setOnClickListener {
                 val intent = Intent(this, CashInMainMenuActivity::class.java)
                 startActivity(intent)
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             }
         } catch (e: Exception) {
             Toast.makeText(this, "Error setting up UI: ${e.message}", Toast.LENGTH_LONG).show()
@@ -107,21 +108,25 @@ class MainUIActivity : AppCompatActivity() {
     fun onTransferClick(view: android.view.View) {
         val intent = Intent(this, ExpressSendActivity::class.java)
         startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
     
     fun onQRCodeClick(view: android.view.View) {
         val intent = Intent(this, QRCodeGeneratorActivity::class.java)
         startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
     
     fun onLoadClick(view: android.view.View) {
         val intent = Intent(this, CashInMainMenuActivity::class.java)
         startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
     
     fun onProfileClick(view: android.view.View) {
         val intent = Intent(this, ProfileActivity::class.java)
         startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
     
     fun onLandmarksClick(view: android.view.View) {

@@ -45,16 +45,19 @@ class QRCodeScannerActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     val intent = Intent(this, MainUIActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 R.id.navigation_profile -> {
                     val intent = Intent(this, ProfileActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 R.id.navigation_location -> {
                     val intent = Intent(this, StationsMapActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 else -> false
@@ -69,21 +72,25 @@ class QRCodeScannerActivity : AppCompatActivity() {
                 R.id.nav_dashboard -> {
                     val intent = Intent(this, MainUIActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 R.id.nav_profile -> {
                     val intent = Intent(this, ProfileActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 R.id.nav_transfer -> {
                     val intent = Intent(this, ExpressSendActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 R.id.nav_stations -> {
                     val intent = Intent(this, StationsMapActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 R.id.nav_landmarks -> {
@@ -93,6 +100,7 @@ class QRCodeScannerActivity : AppCompatActivity() {
                 R.id.nav_settings -> {
                     val intent = Intent(this, UserSettingsActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     true
                 }
                 R.id.nav_logout -> {

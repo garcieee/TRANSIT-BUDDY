@@ -14,7 +14,7 @@ class CashInMainMenuActivity : AppCompatActivity() {
         supportActionBar?.hide()
         
         // Set up back button
-        findViewById<android.widget.ImageButton>(R.id.back).setOnClickListener {
+        findViewById<android.widget.ImageButton>(R.id.topLeftButton).setOnClickListener {
             onBackPressed()
         }
         
