@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Top background image -->
     <ImageView
         android:id="@+id/bgImage"
         android:layout_width="match_parent"
@@ -11,6 +12,7 @@
         android:scaleType="center"
         android:src="@drawable/bgtop" />
 
+    <!-- Back button -->
     <ImageButton
         android:id="@+id/back"
         android:layout_width="55dp"
@@ -20,6 +22,7 @@
         android:src="@drawable/baseline_chevron_left_24"
         app:tint="@android:color/white" />
 
+    <!-- Page title -->
     <TextView
         android:id="@+id/titleText"
         android:layout_width="wrap_content"
@@ -31,6 +34,7 @@
         android:textColor="#f8f8f8"
         android:layout_marginTop="22dp" />
 
+    <!-- Info button -->
     <ImageButton
         android:id="@+id/information"
         android:layout_width="55dp"
@@ -41,16 +45,15 @@
         android:src="@drawable/outline_info_24"
         app:tint="@android:color/white"/>
 
-    <!-- "All cash-in methods" label -->
-
+    <!-- E-wallets with Instapay label -->
     <TextView
-        android:id="@+id/all_methods_label"
+        android:id="@+id/e_wallets_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/titleText"
         android:layout_marginTop="65dp"
         android:layout_marginStart="24dp"
-        android:text="All Cash-In methods"
+        android:text="E-wallets with InstaPay"
         android:fontFamily="@font/red_hat_display_bold"
         android:textColor="#343341"
         android:textSize="24dp" />
@@ -60,25 +63,26 @@
         android:id="@+id/e_wallets_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/all_methods_label"
+        android:layout_below="@id/e_wallets_label"
         android:layout_marginTop="8dp"
         android:layout_marginStart="24dp"
-        android:text="Cash in through your e-wallet or through online banking"
+        android:text="Cash in with your E-wallets like GCash or Maya"
         android:fontFamily="@font/red_hat_display_regualr"
         android:textColor="#7a7a7a"
         android:textSize="14sp" />
 
-    <!-- Section for cash-in options -->
+    <!-- Section for e-wallet buttons -->
     <LinearLayout
+        android:id="@+id/ewallet_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/all_methods_label"
-        android:layout_marginTop="50dp"
+        android:layout_below="@id/e_wallets_subtitle"
+        android:layout_marginTop="40dp"
         android:orientation="vertical">
 
-        <!-- E-wallet with InstaPay -->
+        <!-- GCash Button -->
         <LinearLayout
-            android:id="@+id/ewallet_button"
+            android:id="@+id/gcash_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
@@ -93,15 +97,15 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/outline_wallet_24"
-                app:tint="#000000" />
+                android:src="@drawable/gcash"
+                app:tint="@null" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="16dp"
-                android:text="E-wallet with InstaPay"
+                android:text="GCash"
                 android:fontFamily="@font/red_hat_display_bold"
                 android:textSize="20sp"
                 android:textColor="#343341" />
@@ -113,9 +117,9 @@
                 app:tint="#343341" />
         </LinearLayout>
 
-        <!-- Online Banking with InstaPay -->
+        <!-- Maya Button -->
         <LinearLayout
-            android:id="@+id/online_banking_button"
+            android:id="@+id/maya_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
@@ -129,8 +133,8 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/outline_bank_24"
-                app:tint="#000000" />
+                android:src="@drawable/maya"
+                app:tint="@null" />
 
             <TextView
                 android:layout_width="0dp"
@@ -138,7 +142,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/red_hat_display_bold"
-                android:text="Online Banking with InstaPay"
+                android:text="Maya"
                 android:textColor="#343341"
                 android:textSize="20sp" />
 

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Top background image -->
+    <ImageView
+        android:id="@+id/bgImage"
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:scaleType="center"
+        android:src="@drawable/bgtop" />
+
+    <!-- Back button -->
+    <ImageButton
+        android:id="@+id/back"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_margin="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/baseline_chevron_left_24"
+        app:tint="@android:color/white" />
+
+    <!-- Page title -->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/red_hat_display_bold"
+        android:text="Cash-In"
+        android:textSize="23sp"
+        android:layout_centerHorizontal="true"
+        android:textColor="#f8f8f8"
+        android:layout_marginTop="22dp" />
+
+    <!-- Info button -->
+    <ImageButton
+        android:id="@+id/information"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_margin="10dp"
+        android:layout_alignParentEnd="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/outline_info_24"
+        app:tint="@android:color/white" />
+
+    <!-- Scrollable Instructions -->
+    <ScrollView
+        android:id="@+id/instruction_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/titleText"
+        android:layout_marginTop="65dp"
+        android:paddingHorizontal="24dp"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header -->
+            <TextView
+                android:id="@+id/instruction_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="How to cash-in your GrabPay Wallet with GCash"
+                android:textSize="20sp"
+                android:textColor="#343341"
+                android:fontFamily="@font/red_hat_display_bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Note -->
+            <TextView
+                android:id="@+id/instruction_note"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Note: Your e-wallet may charge you a transfer fee."
+                android:textSize="14sp"
+                android:textColor="#7a7a7a"
+                android:fontFamily="@font/red_hat_display_regualr"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Step-by-step Instructions -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1. Log in to your GCash app and click on Send Money"
+                android:textSize="16sp"
+                android:textColor="#343341"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/red_hat_display_regualr" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2. Click Send to bank > Partner banks > GrabPay Philippines"
+                android:textSize="16sp"
+                android:textColor="#343341"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/red_hat_display_regualr" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3. Enter transfer amount"
+                android:textSize="16sp"
+                android:textColor="#343341"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/red_hat_display_regualr" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4. Enter your recipient's name in Account Name"
+                android:textSize="16sp"
+                android:textColor="#343341"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/red_hat_display_regualr" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5. Enter your recipient's Grab-registered phone number as the Account Number in the following format: 09XX XXX XXXX"
+                android:textSize="16sp"
+                android:textColor="#343341"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/red_hat_display_regualr" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="6. Click on Send Money to complete the process"
+                android:textSize="16sp"
+                android:textColor="#343341"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/red_hat_display_regualr" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Footer Section -->
+    <LinearLayout
+        android:id="@+id/footerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical|center_horizontal">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/outline_info_24"
+            app:tint="#4D4D4D" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Never share your PINs with anyone"
+            android:textSize="12sp"
+            android:textColor="#4D4D4D" />
+    </LinearLayout>
+
+
+</RelativeLayout>
